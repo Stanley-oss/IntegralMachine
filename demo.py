@@ -154,7 +154,7 @@ if __name__ == '__main__':
         "x**3",
         "1/x",
         "x*exp(x)",
-        "x*cos(x)"
+        "x*cos(x)",
     ]
     for expr in tests:
         print(f"∫{expr} dx = {solver.integrate(expr)} + C")
