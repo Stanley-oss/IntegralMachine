@@ -1,5 +1,6 @@
 import ast
 import astunparse
+import sympy
 
 class IntegralSolver:
     def __init__(self):
@@ -145,6 +146,11 @@ class IntegralSolver:
             return ast.Call(func=ast.Name(id='sin'), args=[arg], keywords=[])
         raise ValueError(f"Cannot integrate simple function: {fn}")
 
+
+def to_latex(expr_str):
+    expr = sympy.sympify(expr_str, evaluate=True)
+    return f"{sympy.latex(expr)}"
+
 if __name__ == '__main__':
     solver = IntegralSolver()
     tests = [
@@ -154,7 +160,10 @@ if __name__ == '__main__':
         "x**3",
         "1/x",
         "x*exp(x)",
-        "x*cos(x)",
+        "x*cos(x)"
     ]
     for expr in tests:
-        print(f"∫{expr} dx = {solver.integrate(expr)} + C")
+        result = solver.integrate(expr)
+        print(f"\n∫{expr} dx = {result} + C")
+        print(f"Latex:")
+        print(f"\\int {to_latex(expr)} dx = {to_latex(result)} + C")
