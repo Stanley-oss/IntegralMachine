@@ -16,8 +16,6 @@ class Expression(object):
 
   def __eq__(self, other):
     """
-    Test whether two expressions are equal.
-
     TODO Consider what this means.
          Are expressions equal that simplify to the same thing?
     """
@@ -66,7 +64,7 @@ class VariableSet(object):
         self.lookup = {self.var_x: 'x'}
 
     def variable(self, symbol=None):
-        #返回唯一变量x，这里默认写出来的变量就是x了
+        #返回唯一变量x，这里默认写出来的变量就是x了 也就是我们表达式仅用x字母
         return self.var_x
 
     def symbol_for(self, var):
