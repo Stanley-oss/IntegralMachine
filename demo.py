@@ -160,7 +160,7 @@ if __name__ == '__main__':
         "x**3",
         "1/x",
         "x*exp(x)",
-        "x*cos(x)"
+        "(x**3)*sin(x)"
     ]
     for expr in tests:
         result = solver.integrate(expr)

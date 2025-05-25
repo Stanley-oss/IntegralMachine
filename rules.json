@@ -1,0 +1,38 @@
+[
+    {
+        "name":"Power Rule",
+        "pattern":"x",
+        "cond":"",
+        "result":"(1/2)*x**2"
+    },
+    {
+        "name":"Power Rule",
+        "pattern":"x**c",
+        "cond":"c != 0 && c != -1",
+        "result":"(1/(c + 1))*x**(c + 1)"
+    },
+    {
+        "name":"Log Rule",
+        "pattern":"x**c",
+        "cond":"c == -1",
+        "result":"log(x)"
+    },
+    {
+        "name":"Sin Rule",
+        "pattern":"sin(x)",
+        "cond":"",
+        "result":"-cos(x)"
+    },
+    {
+        "name":"Cos Rule",
+        "pattern":"cos(x)",
+        "cond":"",
+        "result":"sin(x)"
+    },
+    {
+        "name":"Trig Subtition",
+        "pattern":"sqrt(1-x**2)",
+        "cond":"",
+        "result":"(x*sqrt(1-x**2)/2+arcsin(x)/2)"
+    }
+]
