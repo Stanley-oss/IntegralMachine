@@ -1,0 +1,58 @@
+from sympy import symbols, integrate, sympify, pprint, Integral
+from sympy.integrals.manualintegrate import integral_steps
+from sympy.core.sympify import SympifyError
+import re
+
+def fix_common_errors(expr_str):
+    # 自动修复省略括号的函数表达式，如 sinx → sin(x)
+    functions = ['sin', 'cos', 'tan', 'sec', 'csc', 'cot', 'exp', 'log', 'sqrt']
+    for func in functions:
+        expr_str = re.sub(rf'\b{func}([a-zA-Z0-9]+)', rf'{func}(\1)', expr_str)
+    return expr_str
+
+def is_elementary_integral(expr, var):
+    # 判断积分是否为初等函数积分
+    steps = integral_steps(expr, var)
+    return steps is not None
+
+def main():
+    print("🔢 多变量积分计算器：支持不定积分 / 定积分")
+    var_name = input("请输入变量名（如 x）：").strip()
+    var = symbols(var_name)
+
+    expr_input = input(f"请输入关于 {var_name} 的积分表达式（如 sinx / x^2）：").strip()
+    expr_input = fix_common_errors(expr_input)
+
+    try:
+        expr = sympify(expr_input)
+    except SympifyError:
+        print("❌ 无法解析表达式，请检查语法是否正确。")
+        return
+
+    # 是否定积分？
+    definite = input("是否进行定积分？(y/n)：").strip().lower()
+    if definite == 'y':
+        try:
+            a = float(input("请输入积分下限（例如 0）："))
+            b = float(input("请输入积分上限（例如 pi）："))
+            integral_result = integrate(expr, (var, a, b))
+            print("\n📌 定积分表达式为：")
+            pprint(Integral(expr, (var, a, b)), use_unicode=True)
+            print("\n✅ 积分结果为：")
+            pprint(integral_result, use_unicode=True)
+        except Exception as e:
+            print("❌ 输入的上下限有误，请确保是数字或常数符号。")
+    else:
+        print("\n📌 不定积分表达式为：")
+        pprint(Integral(expr, var), use_unicode=True)
+        if is_elementary_integral(expr, var):
+            result = integrate(expr, var)
+            print("\n✅ 结果是一个可用初等函数表示的积分：")
+            pprint(result, use_unicode=True)
+        else:
+            result = integrate(expr, var, evaluate=False)
+            print("\n⚠️ 该积分不能用初等函数表示（保留符号形式）：")
+            pprint(result, use_unicode=True)
+
+if __name__ == "__main__":
+    main()
