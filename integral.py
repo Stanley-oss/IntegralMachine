@@ -4,22 +4,20 @@ import astunparse
 import json
 import copy
 import sympy
-# import astpretty
-
 
 INTEGRAL_VAR = 'x'
 
-class FoldConstants(ast.NodeTransformer):
-    """
-    折叠一元负号为一个单独的常量 -1=(-1)
-    """
-    def visit_UnaryOp(self, node):
-        self.generic_visit(node) # 先处理子节点
-        if isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Constant):
-            value = node.operand.value
-            if isinstance(value, (int,float,Fraction)):
-                return ast.copy_location(ast.Constant(value=-value),node)
-        return node
+# class FoldConstants(ast.NodeTransformer):
+#     """
+#     折叠一元负号为一个单独的常量 -1=(-1)
+#     """
+#     def visit_UnaryOp(self, node):
+#         self.generic_visit(node) # 先处理子节点
+#         if isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Constant):
+#             value = node.operand.value
+#             if isinstance(value, (int,float,Fraction)):
+#                 return ast.copy_location(ast.Constant(value=-value),node)
+#         return node
     
 class ApplyMapping(ast.NodeTransformer):
     """
@@ -70,7 +68,7 @@ class IntegralSolver:
         """
         把Python风格的字符串表达式转化为AST
         """
-        return FoldConstants().visit(ast.parse(str(self.str_to_sympy(expr)),mode='eval').body)
+        return ast.parse(str(self.str_to_sympy(expr)),mode='eval').body
 
     def ast_expand(self,expr):
         """
@@ -142,6 +140,22 @@ class IntegralSolver:
                 return False
             return self.match(pattern.operand,node.operand,mapping_dict)
         if isinstance(pattern,ast.BinOp): # 模式要求一个二元运算符
+            #下面特判模式要求a*x 或 x*a (a为1时的情况)
+            if ((isinstance(pattern.left, ast.Name) and isinstance(pattern.right, ast.Name) and pattern.right.id == INTEGRAL_VAR) and # a*x
+                (isinstance(node,ast.Name) and node.id == INTEGRAL_VAR)):
+                if pattern.left.id in mapping_dict:
+                    return self.ast_equal(mapping_dict[pattern.left.id],ast.Constant(value=1))
+                else:
+                    mapping_dict[pattern.left.id] = ast.Constant(value=1)
+                    return True
+            if ((isinstance(pattern.right, ast.Name) and isinstance(pattern.left, ast.Name) and pattern.left.id == INTEGRAL_VAR) and  # x*a
+                (isinstance(node,ast.Name) and node.id == INTEGRAL_VAR)):
+                if pattern.right.id in mapping_dict:
+                    return self.ast_equal(mapping_dict[pattern.right.id],ast.Constant(value=1))
+                else:
+                    mapping_dict[pattern.right.id] = ast.Constant(value=1)
+                    return True
+            
             if not isinstance(node,ast.BinOp) or type(node.op) != type(pattern.op):
                 return False
             return (self.match(pattern.left,node.left,mapping_dict)
@@ -249,16 +263,24 @@ class IntegralSolver:
 
 if __name__ == '__main__':
     tests = ["114514",
-             "sin(x)/3",
-             "0.25*cos(x)+8*x**5",
-             "5+x",
-             "(2*x+3)**2",
-             "x**2+x**3",
-             "sqrt(1-x**2)",
-             "1/x",
-             "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)" # 部分分式可积 ((x + (3 / (x + 1))) - (2 / ((x + 1) ** 2)))
-             #"x*exp(x)",
-             #"(x**2)*(sin(x)**2)"
+              "sin(x)/3",
+              "0.25*cos(x)+8*x**5",
+              "5+x",
+              "(2*x+3)**2",
+              "x**2+x**3",
+              "sqrt(1-x**2)",
+              "1/(4*x+3)",
+              "exp(3*x)",
+              "1/(5*x + 2)",
+              "sin(4*x)",
+              "cos(-2*x)",
+              "tan(x)",
+              "1/cos(x)**2",
+              "x*exp(x)",
+              "x*sin(x)",
+              "x*cos(x)",
+              "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)", # 部分分式
+              #"(x**2)*(sin(x)**2)" #连续换元两次真投降了
              ]
     solver = IntegralSolver()
 
@@ -327,7 +349,7 @@ if __name__ == '__main__':
         # 尝试展开多项式
         ast_expr = solver.ast_expand(orig_ast)
         print("Expanded expression:",solver.ast_to_str(ast_expr))
-        try_res = solver.try_rules(ast_expr)
+        try_res = test_integral(ast_expr)
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
@@ -336,7 +358,7 @@ if __name__ == '__main__':
         # 尝试分解分式
         ast_expr = solver.ast_apart(orig_ast)
         print("Aparted expression:",solver.ast_to_str(ast_expr))
-        try_res = solver.try_rules(ast_expr)
+        try_res = test_integral(ast_expr)
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
@@ -345,7 +367,7 @@ if __name__ == '__main__':
         # 尝试化简
         ast_expr = solver.ast_cancel(orig_ast)
         print("Canceled expression:",solver.ast_to_str(ast_expr))
-        try_res = solver.try_rules(ast_expr)
+        try_res = test_integral(ast_expr)
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
@@ -356,3 +378,5 @@ if __name__ == '__main__':
 
     for item in lst:
         print(item)
+    
+    print(f"Solved {len(lst)} of {len(tests)} expressions.")

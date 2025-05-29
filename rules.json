@@ -34,5 +34,65 @@
         "pattern":"sqrt(1-x**2)",
         "cond":"",
         "result":"(x*sqrt(1-x**2)/2+arcsin(x)/2)"
+    },
+    {
+        "name": "Exponential Rule",
+        "pattern": "exp(c*x)",
+        "cond": "c != 0",
+        "result": "(1/c)*exp(c*x)"
+    },
+    {
+        "name": "Log Rule",
+        "pattern": "1/(a*x + b)",
+        "cond": "a != 0",
+        "result": "(1/a)*log(a*x + b)"
+    },
+    {
+        "name": "Sin Rule",
+        "pattern": "sin(c*x)",
+        "cond": "c != 0",
+        "result": "-cos(c*x)/c"
+    },
+    {
+        "name": "Cos Rule",
+        "pattern": "cos(c*x)",
+        "cond": "c != 0",
+        "result": "sin(c*x)/c"
+    },
+    {
+        "name": "Tangent Rule",
+        "pattern": "tan(x)",
+        "cond": "",
+        "result": "-log(cos(x))"
+    },
+    {
+        "name": "Sec^2 Rule",
+        "pattern": "cos(x)**(-2)",
+        "cond": "",
+        "result": "tan(x)"
+    },
+    {
+        "name": "By Parts: x*exp(x)",
+        "pattern": "x*exp(x)",
+        "cond": "",
+        "result": "x*exp(x) - exp(x)"
+    },
+    {
+        "name": "By Parts: x*sin(x)",
+        "pattern": "x*sin(x)",
+        "cond": "",
+        "result": "-x*cos(x) + sin(x)"
+    },
+    {
+        "name": "By Parts: x*cos(x)",
+        "pattern": "x*cos(x)",
+        "cond": "",
+        "result": "x*sin(x) - cos(x)"
+    },
+    {
+        "name": "Reciprocal Linear Square",
+        "pattern": "(a*x + b)**(-2)",
+        "cond": "a != 0",
+        "result": "-1/(a*(a*x + b))"
     }
 ]
