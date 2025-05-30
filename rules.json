@@ -35,64 +35,210 @@
         "cond":"",
         "result":"(x*sqrt(1-x**2)/2+arcsin(x)/2)"
     },
+    
     {
-        "name": "Exponential Rule",
-        "pattern": "exp(c*x)",
-        "cond": "c != 0",
-        "result": "(1/c)*exp(c*x)"
+        "name":"Exponential Rule",                 
+        "pattern":"exp(k*x)",
+        "cond":"k != 0",
+        "result":"(1/k)*exp(k*x)"
     },
     {
-        "name": "Log Rule",
-        "pattern": "1/(a*x + b)",
-        "cond": "a != 0",
-        "result": "(1/a)*log(a*x + b)"
+        "name":"Base-a Exponential Rule",          
+        "pattern":"a**x",
+        "cond":"a > 0 && a != 1",
+        "result":"(a**x)/log(a)"
     },
     {
-        "name": "Sin Rule",
-        "pattern": "sin(c*x)",
-        "cond": "c != 0",
-        "result": "-cos(c*x)/c"
+        "name":"General Sin Rule",                 
+        "pattern":"sin(k*x)",
+        "cond":"k != 0",
+        "result":"-cos(k*x)/k"
     },
     {
-        "name": "Cos Rule",
-        "pattern": "cos(c*x)",
-        "cond": "c != 0",
-        "result": "sin(c*x)/c"
+        "name":"General Cos Rule",                 
+        "pattern":"cos(k*x)",
+        "cond":"k != 0",
+        "result":"sin(k*x)/k"
     },
     {
-        "name": "Tangent Rule",
-        "pattern": "tan(x)",
-        "cond": "",
-        "result": "-log(cos(x))"
+        "name":"Secant-Squared Rule",              
+        "pattern":"sec(x)**2",
+        "cond":"",
+        "result":"tan(x)"
     },
     {
-        "name": "Sec^2 Rule",
-        "pattern": "cos(x)**(-2)",
-        "cond": "",
-        "result": "tan(x)"
+        "name":"Cosecant-Squared Rule",
+        "pattern":"csc(x)**2",          
+        "cond":"",
+        "result":"-cot(x)"
     },
     {
-        "name": "By Parts: x*exp(x)",
-        "pattern": "x*exp(x)",
-        "cond": "",
-        "result": "x*exp(x) - exp(x)"
+        "name":"Secant-Tangent Rule",              
+        "pattern":"sec(x)*tan(x)",
+        "cond":"",
+        "result":"sec(x)"
     },
     {
-        "name": "By Parts: x*sin(x)",
-        "pattern": "x*sin(x)",
-        "cond": "",
-        "result": "-x*cos(x) + sin(x)"
+        "name":"Cosecant-Cotangent Rule",          
+        "pattern":"csc(x)*cot(x)",
+        "cond":"",
+        "result":"-csc(x)"
     },
     {
-        "name": "By Parts: x*cos(x)",
-        "pattern": "x*cos(x)",
-        "cond": "",
-        "result": "x*sin(x) - cos(x)"
+        "name":"Inverse Sqrt Rule",                
+        "pattern":"1/sqrt(1-x**2)",
+        "cond":"",
+        "result":"arcsin(x)"
     },
     {
-        "name": "Reciprocal Linear Square",
-        "pattern": "(a*x + b)**(-2)",
-        "cond": "a != 0",
-        "result": "-1/(a*(a*x + b))"
+        "name":"Inverse Quadratic Rule",           
+        "pattern":"1/(1+x**2)",
+        "cond":"",
+        "result":"arctan(x)"
+    },
+    {
+        "name":"Natural Log Rule",                 
+        "pattern":"log(x)",
+        "cond":"",
+        "result":"x*log(x) - x"
+    },
+    {
+        "name":"Exp-With-Coeff Rule",              
+        "pattern":"c*exp(k*x)",
+        "cond":"k != 0",
+        "result":"(c/k)*exp(k*x)"
+    },
+    {
+        "name":"Sin-Squared Rule",
+        "pattern":"sin(x)**2",                
+        "cond":"",
+        "result":"x/2 - sin(2*x)/4"
+    },
+    {
+        "name":"Cos-Squared Rule",                 
+        "pattern":"cos(x)**2",
+        "cond":"",
+        "result":"x/2 + sin(2*x)/4"
+    },
+    {
+        "name":"Hyperbolic Sin Rule",
+        "pattern":"sinh(x)",              
+        "cond":"",
+        "result":"cosh(x)"
+    },
+    {
+        "name":"Hyperbolic Cos Rule",              
+        "pattern":"cosh(x)",
+        "cond":"",
+        "result":"sinh(x)"
+    },
+    {
+        "name":"Reciprocal Linear Rule",           
+        "pattern":"1/(a*x + b)",
+        "cond":"a != 0",
+        "result":"(1/a)*log(a*x + b)"
+    },
+    {
+        "name":"Shifted Power Rule",               
+        "pattern":"(a*x + b)**n",
+        "cond":"a != 0 && n != -1",
+        "result":"(a*x + b)**(n + 1)/(a*(n + 1))"
+    },
+    {
+        "name":"Tangent Rule",                     
+        "pattern":"tan(k*x)",
+        "cond":"k != 0",
+        "result":"-log(abs(cos(k*x)))/k"
+    },
+    {
+        "name":"Cotangent Rule",
+        "pattern":"cot(k*x)",                   
+        "cond":"k != 0",
+        "result":"log(abs(sin(k*x)))/k"
+    },
+    {
+        "name":"Secant Rule",                      
+        "pattern":"sec(k*x)",
+        "cond":"k != 0",
+        "result":"log(abs(sec(k*x) + tan(k*x)))/k"
+    },
+    {
+        "name":"Cosecant Rule",                    
+        "pattern":"csc(k*x)",
+        "cond":"k != 0",
+        "result":"-log(abs(csc(k*x) + cot(k*x)))/k"
+    },
+    {
+        "name":"Hyperbolic Tangent Rule",          
+        "pattern":"tanh(k*x)",
+        "cond":"k != 0",
+        "result":"log(cosh(k*x))/k"
+    },
+    {
+        "name":"Sinh-Squared Rule",                
+        "pattern":"sinh(x)**2",
+        "cond":"",
+        "result":"(sinh(x)*cosh(x))/2 - x/2"
+    },
+    {
+        "name":"Cosh-Squared Rule",                
+        "pattern":"cosh(x)**2",
+        "cond":"",
+        "result":"(sinh(x)*cosh(x))/2 + x/2"
+    },
+    {
+        "name":"Inverse-Trig Arcsin Rule",         
+        "pattern":"arcsin(x)",
+        "cond":"",
+        "result":"x*arcsin(x) + sqrt(1 - x**2)"
+    },
+    {
+        "name":"Inverse-Trig Arctan Rule",         
+        "pattern":"arctan(x)",
+        "cond":"",
+        "result":"x*arctan(x) - (1/2)*log(1 + x**2)"
+    },
+    {
+        "name":"x·e^{kx} Rule",                    
+        "pattern":"x*exp(k*x)",
+        "cond":"k != 0",
+        "result":"exp(k*x)*(k*x - 1)/(k**2)"
+    },
+    {
+        "name":"x·sin(kx) Rule",                   
+        "pattern":"x*sin(k*x)",
+        "cond":"k != 0",
+        "result":"-x*cos(k*x)/k + sin(k*x)/k**2"
+    },
+    {
+        "name":"x·cos(kx) Rule",                   
+        "pattern":"x*cos(k*x)",
+        "cond":"k != 0",
+        "result":"x*sin(k*x)/k + cos(k*x)/k**2"
+    },
+    {
+        "name":"Sqrt(x²+a²) Rule",                 
+        "pattern":"sqrt(x**2 + a**2)",
+        "cond":"a > 0",
+        "result":"0.5*(x*sqrt(x**2 + a**2) + a**2*log(x + sqrt(x**2 + a**2)))"
+    },
+    {
+        "name":"Sqrt(x² - a²) Rule",                 
+        "pattern":"sqrt(x**2 - a**2)",
+        "cond":"a > 0 && abs(x) > a",
+        "result":"0.5*(x*sqrt(x**2 - a**2) - a**2*log(abs(x + sqrt(x**2 - a**2))))"
+    },
+    {
+        "name":"Log-Power Combo",                  
+        "pattern":"x**c*log(x)",
+        "cond":"c != -1",
+        "result":"x**(c + 1)*log(x)/(c + 1) - x**(c + 1)/(c + 1)**2"
+    },
+    {
+        "name":"Partial Fraction Simple",          
+        "pattern":"1/(x**2 - a**2)",
+        "cond":"a != 0",
+        "result":"(1/(2*a))*log(abs((x - a)/(x + a)))"
     }
+    
 ]

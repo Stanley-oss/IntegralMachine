@@ -256,7 +256,7 @@ class IntegralSolver:
                 if ok:
                     res_ast = ast.parse(rule['result'],mode='eval').body
                     res_ast = ApplyMapping(mapping_dict).visit(res_ast)
-                    # return res_ast, rule['name'] # 这里可以回溯用了什么规则
+                    #return res_ast, rule['name'] # 这里可以回溯用了什么规则
                     return res_ast
         print(f"NOT SUPPORTED: {astunparse.unparse(node).strip()}")
         return None
@@ -334,6 +334,7 @@ if __name__ == '__main__':
         return solver.try_rules(node)
 
     lst = []
+    lst_name = [[] for _ in tests]
 
     for expr in tests:
         print("Original expression:",expr)
