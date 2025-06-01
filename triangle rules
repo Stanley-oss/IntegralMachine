@@ -1,0 +1,488 @@
+[
+    {
+        "name": "Trig Identity",
+        "pattern": "sin(x)**2 + cos(x)**2",
+        "cond": "",
+        "result": "1"
+    },
+    {
+        "name": "Pythagorean Identity",
+        "pattern": "tan(x)**2 + 1",
+        "cond": "",
+        "result": "sec(x)**2"
+    },
+    {
+        "name": "Pythagorean Identity",
+        "pattern": "1 + cot(x)**2",
+        "cond": "",
+        "result": "csc(x)**2"
+    },
+    {
+        "name": "Pythagorean Identity (Reversed)",
+        "pattern": "sec(x)**2 - 1",
+        "cond": "",
+        "result": "tan(x)**2"
+    },
+    {
+        "name": "Pythagorean Identity (Reversed)",
+        "pattern": "csc(x)**2 - 1",
+        "cond": "",
+        "result": "cot(x)**2"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "1 - cos(x)**2",
+        "cond": "",
+        "result": "sin(x)**2"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "1 - sin(x)**2",
+        "cond": "",
+        "result": "cos(x)**2"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "tan(x)",
+        "cond": "",
+        "result": "sin(x)/cos(x)"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "cot(x)",
+        "cond": "",
+        "result": "cos(x)/sin(x)"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "sec(x)",
+        "cond": "",
+        "result": "1/cos(x)"
+    },
+    {
+        "name": "Trig Identity",
+        "pattern": "csc(x)",
+        "cond": "",
+        "result": "1/sin(x)"
+    },
+    {
+        "name": "Sum Formula - Sine",
+        "pattern": "sin(a + b)",
+        "cond": "",
+        "result": "sin(a)*cos(b) + cos(a)*sin(b)"
+    },
+    {
+        "name": "Difference Formula - Sine",
+        "pattern": "sin(a - b)",
+        "cond": "",
+        "result": "sin(a)*cos(b) - cos(a)*sin(b)"
+    },
+    {
+        "name": "Sum Formula - Cosine",
+        "pattern": "cos(a + b)",
+        "cond": "",
+        "result": "cos(a)*cos(b) - sin(a)*sin(b)"
+    },
+    {
+        "name": "Difference Formula - Cosine",
+        "pattern": "cos(a - b)",
+        "cond": "",
+        "result": "cos(a)*cos(b) + sin(a)*sin(b)"
+    },
+    {
+        "name": "Sum Formula - Tangent",
+        "pattern": "tan(a + b)",
+        "cond": "tan(a)*tan(b) != 1",
+        "result": "(tan(a) + tan(b)) / (1 - tan(a)*tan(b))"
+    },
+    {
+        "name": "Difference Formula - Tangent",
+        "pattern": "tan(a - b)",
+        "cond": "tan(a)*tan(b) != 1",
+        "result": "(tan(a) - tan(b)) / (1 + tan(a)*tan(b))"
+    },
+    {
+        "name": "Sum Formula - Cotangent",
+        "pattern": "cot(a + b)",
+        "cond": "cot(b) + cot(a) != 0",
+        "result": "(cot(a)*cot(b) - 1) / (cot(b) + cot(a))"
+    },
+    {
+        "name": "Difference Formula - Cotangent",
+        "pattern": "cot(a - b)",
+        "cond": "cot(b) - cot(a) != 0",
+        "result": "(cot(a)*cot(b) + 1) / (cot(b) - cot(a))"
+    },
+    {
+        "name": "Sum Formula - Secant",
+        "pattern": "sec(a + b)",
+        "cond": "tan(a)*tan(b) != 1",
+        "result": "(sec(a)*sec(b)) / (1 - tan(a)*tan(b))"
+    },
+    {
+        "name": "Difference Formula - Secant",
+        "pattern": "sec(a - b)",
+        "cond": "tan(a)*tan(b) != 1",
+        "result": "(sec(a)*sec(b)) / (1 + tan(a)*tan(b))"
+    },
+    {
+        "name": "Sum Formula - Cosecant",
+        "pattern": "csc(a + b)",
+        "cond": "cot(b) + cot(a) != 0",
+        "result": "(csc(a)*csc(b)) / (cot(b) + cot(a))"
+    },
+    {
+        "name": "Difference Formula - Cosecant",
+        "pattern": "csc(a - b)",
+        "cond": "cot(b) - cot(a) != 0",
+        "result": "(csc(a)*csc(b)) / (cot(b) - cot(a))"
+    },
+    {
+        "name": "Double Angle - Sine",
+        "pattern": "sin(2*x)",
+        "cond": "",
+        "result": "2*sin(x)*cos(x)"
+    },
+    {
+        "name": "Double Angle - Sine (tan form)",
+        "pattern": "sin(2*x)",
+        "cond": "",
+        "result": "(2*tan(x)) / (1 + tan(x)**2)"
+    },
+    {
+        "name": "Double Angle - Cosine (cos² - sin²)",
+        "pattern": "cos(2*x)",
+        "cond": "",
+        "result": "cos(x)**2 - sin(x)**2"
+    },
+    {
+        "name": "Double Angle - Cosine (in terms of cos)",
+        "pattern": "cos(2*x)",
+        "cond": "",
+        "result": "2*cos(x)**2 - 1"
+    },
+    {
+        "name": "Double Angle - Cosine (in terms of sin)",
+        "pattern": "cos(2*x)",
+        "cond": "",
+        "result": "1 - 2*sin(x)**2"
+    },
+    {
+        "name": "Double Angle - Tangent",
+        "pattern": "tan(2*x)",
+        "cond": "tan(x) != 1",
+        "result": "(2*tan(x)) / (1 - tan(x)**2)"
+    },
+    {
+        "name": "Double Angle - Cotangent",
+        "pattern": "cot(2*x)",
+        "cond": "cot(x) != tan(x)",
+        "result": "(cot(x)**2 - 1) / (2*cot(x))"
+    },
+    {
+        "name": "Double Angle - Secant",
+        "pattern": "sec(2*x)",
+        "cond": "",
+        "result": "sec(x)**2 / (2 - sec(x)**2)"
+    },
+    {
+        "name": "Double Angle - Cosecant",
+        "pattern": "csc(2*x)",
+        "cond": "",
+        "result": "csc(x)**2 / (2*cot(x))"
+    },
+    {
+        "name": "Power Reducing - sin²",
+        "pattern": "sin(x)**2",
+        "cond": "",
+        "result": "(1 - cos(2*x)) / 2"
+    },
+    {
+        "name": "Power Reducing - cos²",
+        "pattern": "cos(x)**2",
+        "cond": "",
+        "result": "(1 + cos(2*x)) / 2"
+    },
+    {
+        "name": "Power Reducing - tan²",
+        "pattern": "tan(x)**2",
+        "cond": "",
+        "result": "(1 - cos(2*x)) / (1 + cos(2*x))"
+    },
+    {
+        "name": "Power Reducing - cot²",
+        "pattern": "cot(x)**2",
+        "cond": "",
+        "result": "(1 + cos(2*x)) / (1 - cos(2*x))"
+    },
+    {
+        "name": "Triple Angle - Sine",
+        "pattern": "sin(3*x)",
+        "cond": "",
+        "result": "3*sin(x) - 4*sin(x)**3"
+    },
+    {
+        "name": "Triple Angle - Sine (product form)",
+        "pattern": "sin(3*x)",
+        "cond": "",
+        "result": "4*sin(x)*sin(pi/3 - x)*sin(pi/3 + x)"
+    },
+    {
+        "name": "Triple Angle - Cosine",
+        "pattern": "cos(3*x)",
+        "cond": "",
+        "result": "4*cos(x)**3 - 3*cos(x)"
+    },
+    {
+        "name": "Triple Angle - Cosine (product form)",
+        "pattern": "cos(3*x)",
+        "cond": "",
+        "result": "4*cos(x)*cos(pi/3 - x)*cos(pi/3 + x)"
+    },
+    {
+        "name": "Triple Angle - Tangent",
+        "pattern": "tan(3*x)",
+        "cond": "tan(x) != sqrt(3)",
+        "result": "(3*tan(x) - tan(x)**3) / (1 - 3*tan(x)**2)"
+    },
+    {
+        "name": "Triple Angle - Tangent (product form)",
+        "pattern": "tan(3*x)",
+        "cond": "",
+        "result": "tan(x)*tan(pi/3 - x)*tan(pi/3 + x)"
+    },
+    {
+        "name": "Triple Angle - Cotangent",
+        "pattern": "cot(3*x)",
+        "cond": "cot(x) != sqrt(3)",
+        "result": "(cot(x)**3 - 3*cot(x)) / (3*cot(x)**2 - 1)"
+    },
+    {
+        "name": "Triple Angle - Cotangent (product form)",
+        "pattern": "cot(3*x)",
+        "cond": "",
+        "result": "cot(x)*cot(pi/3 - x)*cot(pi/3 + x)"
+    },
+    {
+        "name": "Triple Angle - Secant",
+        "pattern": "sec(3*x)",
+        "cond": "sec(x)**2 != 4/3",
+        "result": "sec(x)**3 / (4 - 3*sec(x)**2)"
+    },
+    {
+        "name": "Triple Angle - Secant (product form)",
+        "pattern": "sec(3*x)",
+        "cond": "",
+        "result": "1 / (4*cos(x)*cos(pi/3 - x)*cos(pi/3 + x))"
+    },
+    {
+        "name": "Triple Angle - Cosecant",
+        "pattern": "csc(3*x)",
+        "cond": "csc(x)**2 != 4/3",
+        "result": "csc(x)**3 / (3*csc(x)**2 - 4)"
+    },
+    {
+        "name": "Triple Angle - Cosecant (product form)",
+        "pattern": "csc(3*x)",
+        "cond": "",
+        "result": "1 / (4*sin(x)*sin(pi/3 - x)*sin(pi/3 + x))"
+    },
+    {
+        "name": "Half Angle - Sine",
+        "pattern": "sin(x/2)",
+        "cond": "",
+        "result": "±sqrt((1 - cos(x)) / 2)"
+    },
+    {
+        "name": "Half Angle - Cosine",
+        "pattern": "cos(x/2)",
+        "cond": "",
+        "result": "±sqrt((1 + cos(x)) / 2)"
+    },
+    {
+        "name": "Half Angle - Tangent",
+        "pattern": "tan(x/2)",
+        "cond": "cos(x) != 1",
+        "result": "±sqrt((1 - cos(x)) / (1 + cos(x)))"
+    },
+    {
+        "name": "Half Angle - Tangent (sin/cos form)",
+        "pattern": "tan(x/2)",
+        "cond": "cos(x) != 1",
+        "result": "sin(x) / (1 + cos(x))"
+    },
+    {
+        "name": "Half Angle - Tangent (alt form)",
+        "pattern": "tan(x/2)",
+        "cond": "cos(x) != -1",
+        "result": "(1 - cos(x)) / sin(x)"
+    },
+    {
+        "name": "Half Angle - Tangent (cot form)",
+        "pattern": "tan(x/2)",
+        "cond": "",
+        "result": "sqrt(cot(x)**2 + 1) - cot(x)"
+    },
+    {
+        "name": "Half Angle - Cotangent",
+        "pattern": "cot(x/2)",
+        "cond": "",
+        "result": "±sqrt((1 + cos(x)) / (1 - cos(x)))"
+    },
+    {
+        "name": "Half Angle - Cotangent (sin/cos form)",
+        "pattern": "cot(x/2)",
+        "cond": "cos(x) != -1",
+        "result": "sin(x) / (1 - cos(x))"
+    },
+    {
+        "name": "Half Angle - Cotangent (alt form)",
+        "pattern": "cot(x/2)",
+        "cond": "cos(x) != 1",
+        "result": "(1 + cos(x)) / sin(x)"
+    },
+    {
+        "name": "Half Angle - Cotangent (cot form)",
+        "pattern": "cot(x/2)",
+        "cond": "",
+        "result": "sqrt(cot(x)**2 + 1) + cot(x)"
+    },
+    {
+        "name": "Half Angle - Secant",
+        "pattern": "sec(x/2)",
+        "cond": "sec(x) != -1",
+        "result": "±sqrt((2 * sec(x)) / (sec(x) + 1))"
+    },
+    {
+        "name": "Half Angle - Cosecant",
+        "pattern": "csc(x/2)",
+        "cond": "sec(x) != 1",
+        "result": "±sqrt((2 * sec(x)) / (sec(x) - 1))"
+    },
+    {
+        "name": "Power Reduction - sin²",
+        "pattern": "sin(x)**2",
+        "cond": "",
+        "result": "(1 - cos(2*x)) / 2"
+    },
+    {
+        "name": "Power Reduction - cos²",
+        "pattern": "cos(x)**2",
+        "cond": "",
+        "result": "(1 + cos(2*x)) / 2"
+    },
+    {
+        "name": "Power Reduction - sin³",
+        "pattern": "sin(x)**3",
+        "cond": "",
+        "result": "(3*sin(x) - sin(3*x)) / 4"
+    },
+    {
+        "name": "Power Reduction - cos³",
+        "pattern": "cos(x)**3",
+        "cond": "",
+        "result": "(3*cos(x) + cos(3*x)) / 4"
+    },
+    {
+        "name": "Power Reduction - sin⁴",
+        "pattern": "sin(x)**4",
+        "cond": "",
+        "result": "(3 - 4*cos(2*x) + cos(4*x)) / 8"
+    },
+    {
+        "name": "Power Reduction - cos⁴",
+        "pattern": "cos(x)**4",
+        "cond": "",
+        "result": "(3 + 4*cos(2*x) + cos(4*x)) / 8"
+    },
+    {
+        "name": "Power Reduction - sin⁵",
+        "pattern": "sin(x)**5",
+        "cond": "",
+        "result": "(10*sin(x) - 5*sin(3*x) + sin(5*x)) / 16"
+    },
+    {
+        "name": "Power Reduction - cos⁵",
+        "pattern": "cos(x)**5",
+        "cond": "",
+        "result": "(10*cos(x) + 5*cos(3*x) + cos(5*x)) / 16"
+    },
+    {
+        "name": "Power Reduction - sin²·cos²",
+        "pattern": "sin(x)**2 * cos(x)**2",
+        "cond": "",
+        "result": "(1 - cos(4*x)) / 8"
+    },
+    {
+        "name": "Power Reduction - sin³·cos³",
+        "pattern": "sin(x)**3 * cos(x)**3",
+        "cond": "",
+        "result": "(3*sin(2*x) - sin(6*x)) / 32"
+    },
+    {
+        "name": "Power Reduction - sin⁴·cos⁴",
+        "pattern": "sin(x)**4 * cos(x)**4",
+        "cond": "",
+        "result": "(3 - 4*cos(4*x) + cos(8*x)) / 128"
+    },
+    {
+        "name": "Power Reduction - sin⁵·cos⁵",
+        "pattern": "sin(x)**5 * cos(x)**5",
+        "cond": "",
+        "result": "(10*sin(2*x) - 5*sin(6*x) + sin(10*x)) / 512"
+    },
+    {
+        "name": "Product-to-Sum - sin(a)*cos(b)",
+        "pattern": "sin(a)*cos(b)",
+        "cond": "",
+        "result": "(sin(a + b) + sin(a - b)) / 2"
+    },
+    {
+        "name": "Product-to-Sum - cos(a)*sin(b)",
+        "pattern": "cos(a)*sin(b)",
+        "cond": "",
+        "result": "(sin(a + b) - sin(a - b)) / 2"
+    },
+    {
+        "name": "Product-to-Sum - cos(a)*cos(b)",
+        "pattern": "cos(a)*cos(b)",
+        "cond": "",
+        "result": "(cos(a + b) + cos(a - b)) / 2"
+    },
+    {
+        "name": "Product-to-Sum - sin(a)*sin(b)",
+        "pattern": "sin(a)*sin(b)",
+        "cond": "",
+        "result": "-(cos(a + b) - cos(a - b)) / 2"
+    },
+    {
+        "name": "Sum-to-Product - sin(a) + sin(b)",
+        "pattern": "sin(a) + sin(b)",
+        "cond": "",
+        "result": "2*sin((a + b)/2)*cos((a - b)/2)"
+    },
+    {
+        "name": "Sum-to-Product - sin(a) - sin(b)",
+        "pattern": "sin(a) - sin(b)",
+        "cond": "",
+        "result": "2*cos((a + b)/2)*sin((a - b)/2)"
+    },
+    {
+        "name": "Sum-to-Product - cos(a) + cos(b)",
+        "pattern": "cos(a) + cos(b)",
+        "cond": "",
+        "result": "2*cos((a + b)/2)*cos((a - b)/2)"
+    },
+    {
+        "name": "Sum-to-Product - cos(a) - cos(b)",
+        "pattern": "cos(a) - cos(b)",
+        "cond": "",
+        "result": "-2*sin((a + b)/2)*sin((a - b)/2)"
+    },
+    {
+        "name": "Sin-Cos to Single Sine",
+        "pattern": "a*sin(x) + b*cos(x)",
+        "cond": "a > 0",
+        "result": "sqrt(a**2 + b**2) * sin(x + atan(b/a))"
+    }
+]
