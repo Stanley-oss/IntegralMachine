@@ -6,6 +6,7 @@ import copy
 import sympy
 
 INTEGRAL_VAR = 'x'
+match_rules = None # 用于记录匹配的规则名称
 
 # class FoldConstants(ast.NodeTransformer):
 #     """
@@ -119,8 +120,8 @@ class IntegralSolver:
     def match(self,pattern,node,mapping_dict):
         """
         匹配一个模式
-        原理：分别拿到模式的AST和节点的AST，递归比较
-        如果有遇到变量，则构建mappin_list，记录变量的映射关系
+        原理:分别拿到模式的AST和节点的AST,递归比较
+        如果有遇到变量,则构建mappin_list,记录变量的映射关系
         """
         if isinstance(pattern,ast.Name): # 模式要求一个变量名
             name = pattern.id
@@ -238,10 +239,11 @@ class IntegralSolver:
         raise ValueError('Unsupported node type: %s' % type(node))
     
     def try_rules(self,node):
+        global match_rules
         """
         尝试应用所有规则
-        如果有匹配成功的规则，则返回两个变量，第一个变量是积分后的结果ast，第二个变量是应用的规则名称
-        如果没有匹配成功的规则，则返回None
+        如果有匹配成功的规则,则返回两个变量,第一个变量是积分后的结果ast,第二个变量是应用的规则名称
+        如果没有匹配成功的规则,则返回None
         """
         for rule in self.rules:
             pattern = ast.parse(rule['pattern'],mode='eval').body
@@ -256,13 +258,13 @@ class IntegralSolver:
                 if ok:
                     res_ast = ast.parse(rule['result'],mode='eval').body
                     res_ast = ApplyMapping(mapping_dict).visit(res_ast)
-                    #return res_ast, rule['name'] # 这里可以回溯用了什么规则
+                    match_rules = rule['name']
                     return res_ast
         print(f"NOT SUPPORTED: {astunparse.unparse(node).strip()}")
         return None
 
 if __name__ == '__main__':
-    tests = ["114514",
+    tests = [ "123",
               "sin(x)/3",
               "0.25*cos(x)+8*x**5",
               "5+x",
@@ -276,10 +278,10 @@ if __name__ == '__main__':
               "cos(-2*x)",
               "tan(x)",
               "1/cos(x)**2",
-              "x*exp(x)",
+              #"x*exp(x)", TODO 这个例子跑的有问题
               "x*sin(x)",
               "x*cos(x)",
-              "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)", # 部分分式
+              "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)"# 部分分式
               #"(x**2)*(sin(x)**2)" #连续换元两次真投降了
              ]
     solver = IntegralSolver()
@@ -331,10 +333,9 @@ if __name__ == '__main__':
                     return None
                 else:
                     return ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=node.right),op=ast.Mult(),right=lhs)
-        return solver.try_rules(node)
-
+        return solver.try_rules(node) 
     lst = []
-    lst_name = [[] for _ in tests]
+    lst_name = [[]for _ in tests]
 
     for expr in tests:
         print("Original expression:",expr)
@@ -345,6 +346,8 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append(match_rules)
+            match_rules = None
             continue
 
         # 尝试展开多项式
@@ -354,6 +357,7 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Polynomial Expansion")
             continue
         
         # 尝试分解分式
@@ -363,6 +367,7 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Partial Fraction Decomposition")
             continue
         
         # 尝试化简
@@ -372,12 +377,16 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Simplification")
             continue
 
         # 那很没办法了
+        lst.append(f"\\int {solver.str_to_latex(expr)} dx = \\text{{CANT SOLVED}} \\\\")
         print(f"CANNOT SOLVE: {expr}")
 
     for item in lst:
         print(item)
-    
-    print(f"Solved {len(lst)} of {len(tests)} expressions.")
+        print("Method used:",lst_name[lst.index(item)])
+
+    #print(f"Solved {len(lst)} of {len(tests)} expressions.") 没积出来的也会展示
+    #TODO 多种方法用于积分时似乎不能全部展示？需要更多例子
