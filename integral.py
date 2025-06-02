@@ -6,18 +6,19 @@ import copy
 import sympy
 
 INTEGRAL_VAR = 'x'
+match_rules = None # 用于记录匹配的规则名称
 
-# class FoldConstants(ast.NodeTransformer):
-#     """
-#     折叠一元负号为一个单独的常量 -1=(-1)
-#     """
-#     def visit_UnaryOp(self, node):
-#         self.generic_visit(node) # 先处理子节点
-#         if isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Constant):
-#             value = node.operand.value
-#             if isinstance(value, (int,float,Fraction)):
-#                 return ast.copy_location(ast.Constant(value=-value),node)
-#         return node
+class FoldConstants(ast.NodeTransformer):
+    """
+    折叠一元负号为一个单独的常量 -1=(-1)
+    """
+    def visit_UnaryOp(self, node):
+        self.generic_visit(node) # 先处理子节点
+        if isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Constant):
+            value = node.operand.value
+            if isinstance(value, (int,float,Fraction)):
+                return ast.copy_location(ast.Constant(value=-value),node)
+        return node
     
 class ApplyMapping(ast.NodeTransformer):
     """
@@ -68,7 +69,7 @@ class IntegralSolver:
         """
         把Python风格的字符串表达式转化为AST
         """
-        return ast.parse(str(self.str_to_sympy(expr)),mode='eval').body
+        return FoldConstants().visit(ast.parse(str(self.str_to_sympy(expr)),mode='eval').body)
 
     def ast_expand(self,expr):
         """
@@ -80,7 +81,11 @@ class IntegralSolver:
         """
         对AST进行部分分式分解
         """
-        return self.str_to_ast(sympy.apart(self.ast_to_sympy(expr)))
+        try:
+            aparted = sympy.apart(self.ast_to_sympy(expr))
+        except:
+            return None
+        return self.str_to_ast(aparted)
 
     def ast_factor(self,expr):
         """
@@ -115,24 +120,39 @@ class IntegralSolver:
             return len(a) == len(b) and all(self.ast_equal(x,y) for x,y in zip(a,b))
         else:
             return a == b
+        
+    def is_constant(self, node):
+        """
+        检查节点是否为常数表达式（不包含任何变量）
+        """
+        if isinstance(node, ast.Constant):
+            return True
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+            return self.is_constant(node.operand)
+        if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub, ast.Mult, ast.Div)):
+            return self.is_constant(node.left) and self.is_constant(node.right)
+        return False
     
     def match(self,pattern,node,mapping_dict):
         """
         匹配一个模式
-        原理：分别拿到模式的AST和节点的AST，递归比较
-        如果有遇到变量，则构建mappin_list，记录变量的映射关系
+        原理:分别拿到模式的AST和节点的AST,递归比较
+        如果有遇到变量,则构建mappin_list,记录变量的映射关系
         """
         if isinstance(pattern,ast.Name): # 模式要求一个变量名
             name = pattern.id
             if name == INTEGRAL_VAR: # 要求是积分变量x
                 return isinstance(node,ast.Name) and node.id == INTEGRAL_VAR # 节点要求也是积分变量
-            else: # 要求是一个常量？(使用除了x以外的所有标识符指代的东西)
-                # TODO: 其实这里并没要求x以外的标识符一定表示的是常量 我希望这甚至可以是一个多项式 但是还没支持
+            else: # 要求是一个常量（使用除了x以外的所有标识符指代的东西）
+                # 检查节点是否是常数表达式
+                if not self.is_constant(node):
+                    return False  # 不是常数,匹配失败
                 if name in mapping_dict: # 之前出现过这个标识符
                     return self.ast_equal(mapping_dict[name],node) # 则要求映射到的那个东西相同
                 else: # 第一次出现这个标识符
                     mapping_dict[name] = node # 仅记录映射关系
                     return True
+
         if isinstance(pattern,ast.Constant): # 模式要求一个常量
             return isinstance(node,ast.Constant) and pattern.value == node.value
         if isinstance(pattern,ast.UnaryOp): # 模式要求一个元运算符
@@ -140,21 +160,33 @@ class IntegralSolver:
                 return False
             return self.match(pattern.operand,node.operand,mapping_dict)
         if isinstance(pattern,ast.BinOp): # 模式要求一个二元运算符
-            #下面特判模式要求a*x 或 x*a (a为1时的情况)
-            if ((isinstance(pattern.left, ast.Name) and isinstance(pattern.right, ast.Name) and pattern.right.id == INTEGRAL_VAR) and # a*x
-                (isinstance(node,ast.Name) and node.id == INTEGRAL_VAR)):
-                if pattern.left.id in mapping_dict:
-                    return self.ast_equal(mapping_dict[pattern.left.id],ast.Constant(value=1))
-                else:
-                    mapping_dict[pattern.left.id] = ast.Constant(value=1)
-                    return True
-            if ((isinstance(pattern.right, ast.Name) and isinstance(pattern.left, ast.Name) and pattern.left.id == INTEGRAL_VAR) and  # x*a
-                (isinstance(node,ast.Name) and node.id == INTEGRAL_VAR)):
-                if pattern.right.id in mapping_dict:
-                    return self.ast_equal(mapping_dict[pattern.right.id],ast.Constant(value=1))
-                else:
-                    mapping_dict[pattern.right.id] = ast.Constant(value=1)
-                    return True
+            #下面特判模式要求a*x 或 x*a (a为1或-1时的情况)
+            if isinstance(pattern.left, ast.Name) and isinstance(pattern.right, ast.Name) and pattern.right.id == INTEGRAL_VAR: # a*x
+                if isinstance(node,ast.Name) and node.id == INTEGRAL_VAR: # x
+                    if pattern.left.id in mapping_dict:
+                        return self.ast_equal(mapping_dict[pattern.left.id],ast.Constant(value=1))
+                    else:
+                        mapping_dict[pattern.left.id] = ast.Constant(value=1)
+                        return True
+                if isinstance(node,ast.UnaryOp) and isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Name) and node.operand.id == INTEGRAL_VAR: # -x
+                    if pattern.left.id in mapping_dict:
+                        return self.ast_equal(mapping_dict[pattern.left.id],ast.Constant(value=-1))
+                    else:
+                        mapping_dict[pattern.left.id] = ast.Constant(value=-1)
+                        return True
+            if isinstance(pattern.right, ast.Name) and isinstance(pattern.left, ast.Name) and pattern.left.id == INTEGRAL_VAR: # x*a
+                if isinstance(node,ast.Name) and node.id == INTEGRAL_VAR: # x
+                    if pattern.right.id in mapping_dict:
+                        return self.ast_equal(mapping_dict[pattern.right.id],ast.Constant(value=1))
+                    else:
+                        mapping_dict[pattern.right.id] = ast.Constant(value=1)
+                        return True
+                if isinstance(node,ast.UnaryOp) and isinstance(node.op, ast.USub) and isinstance(node.operand, ast.Name) and node.operand.id == INTEGRAL_VAR: # -x
+                    if pattern.right.id in mapping_dict:
+                        return self.ast_equal(mapping_dict[pattern.right.id],ast.Constant(value=-1))
+                    else:
+                        mapping_dict[pattern.right.id] = ast.Constant(value=-1)
+                        return True
             
             if not isinstance(node,ast.BinOp) or type(node.op) != type(pattern.op):
                 return False
@@ -173,18 +205,17 @@ class IntegralSolver:
                 if not self.match(p,n,mapping_dict):
                     return False
             return True
-        return False # 没有任何要求，返回不匹配
+        return False # 没有任何要求,返回不匹配
     
     def judge(self,node,mapping_dict):
         """
         判断一个已经匹配的模式是否还满足额外要求
         目前支持的要求仅有某变量是否大于/等于/不等/小于某个值 多个要求之间可以用and或or(&&,||)连接
-        暂时不支持判断更复杂的(判断是否是一个多项式等)
         """
         if isinstance(node,ast.Constant):
             return node.value
-        if isinstance(node,ast.Name): # 这里的可玩性很大 这个限制可以是针对语法树层面的 不管是常量还是别的什么
-            mapto = mapping_dict.get(node.id) # 映射到被积分式中的那个东西(可能是一个常量或别的)
+        if isinstance(node,ast.Name):
+            mapto = mapping_dict.get(node.id) # 映射到被积分式中的那个东西(是一个常量)
             if isinstance(mapto,ast.Constant):
                 return mapto.value
             else:
@@ -238,16 +269,17 @@ class IntegralSolver:
         raise ValueError('Unsupported node type: %s' % type(node))
     
     def try_rules(self,node):
+        global match_rules
         """
         尝试应用所有规则
-        如果有匹配成功的规则，则返回两个变量，第一个变量是积分后的结果ast，第二个变量是应用的规则名称
-        如果没有匹配成功的规则，则返回None
+        如果有匹配成功的规则,则返回两个变量,第一个变量是积分后的结果ast,第二个变量是应用的规则名称
+        如果没有匹配成功的规则,则返回None
         """
         for rule in self.rules:
             pattern = ast.parse(rule['pattern'],mode='eval').body
             mapping_dict = {}
             if self.match(pattern,node,mapping_dict):
-                # 匹配成功，再检查限制条件
+                # 匹配成功,再检查限制条件
                 cond = rule['cond']
                 ok   = True
                 if cond:
@@ -256,32 +288,38 @@ class IntegralSolver:
                 if ok:
                     res_ast = ast.parse(rule['result'],mode='eval').body
                     res_ast = ApplyMapping(mapping_dict).visit(res_ast)
-                    #return res_ast, rule['name'] # 这里可以回溯用了什么规则
+                    match_rules = rule['name']
                     return res_ast
         print(f"NOT SUPPORTED: {astunparse.unparse(node).strip()}")
         return None
 
 if __name__ == '__main__':
     tests = ["114514",
-              "sin(x)/3",
-              "0.25*cos(x)+8*x**5",
-              "5+x",
-              "(2*x+3)**2",
-              "x**2+x**3",
-              "sqrt(1-x**2)",
-              "1/(4*x+3)",
-              "exp(3*x)",
-              "1/(5*x + 2)",
-              "sin(4*x)",
-              "cos(-2*x)",
-              "tan(x)",
-              "1/cos(x)**2",
-              "x*exp(x)",
-              "x*sin(x)",
-              "x*cos(x)",
-              "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)", # 部分分式
-              #"(x**2)*(sin(x)**2)" #连续换元两次真投降了
-             ]
+             "sin(-x)",
+             "x*exp(x)",
+             "sin(x)/3",
+             "0.25*cos(x)+8*x**5",
+             "0.5 * sin(3 * x) + sin((-1)*x)",
+             "5+x",
+             "(2*x+3)**2",
+             "x**2+x**3",
+             "sqrt(1-x**2)",
+             "1/(4*x+3)",
+             "exp(3*x)",
+             "1/(5*x + 2)",
+             "sin(4*x)",
+             "cos(-2*x)",
+             "tan(x)",
+             "1/cos(x)**2",
+             "x*sin(x)",
+             "x*cos(x)",
+             "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)",
+             "(x**2+2*x+1)/(x**2+2*x+1)**2",
+             "-2*x**2+3*x-x*exp(x)",
+             "-sin(x)",
+             "(0.5 * (sin((x + (2 * x))) + sin((x - (2 * x)))))",
+            #  "(x**2)*(sin(x)**2)" #连续换元两次真投降了
+            ]
     solver = IntegralSolver()
 
     def test_integral(node): # 测试积分函数 用于提出常数利于匹配规则
@@ -289,6 +327,8 @@ if __name__ == '__main__':
             if node.value == 0:
                 return ast.Constant(value=0)
             return ast.BinOp(left=node, op=ast.Mult(), right=ast.Name(id=INTEGRAL_VAR, ctx=ast.Load()))
+        if isinstance(node,ast.UnaryOp) and isinstance(node.op,ast.USub): # 提出一个单独的负号
+                return ast.BinOp(left=ast.Constant(value=-1), op=ast.Mult(), right=test_integral(node.operand))
         if isinstance(node,ast.BinOp) and isinstance(node.op,(ast.Add,ast.Sub)): # 两个表达式相加或相减
             lhs = test_integral(node.left)
             rhs = test_integral(node.right)
@@ -334,17 +374,20 @@ if __name__ == '__main__':
         return solver.try_rules(node)
 
     lst = []
-    lst_name = [[] for _ in tests]
+    lst_name = [[]for _ in tests]
 
     for expr in tests:
         print("Original expression:",expr)
         orig_ast = solver.str_to_ast(expr)
-        # 展示一个积分过程：
+        print("AST:",ast.dump(orig_ast))
+        # 展示一个积分过程:
         # 看看能不能直接匹配
         try_res = test_integral(orig_ast)
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append(match_rules)
+            match_rules = None
             continue
 
         # 尝试展开多项式
@@ -354,16 +397,18 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Polynomial Expansion")
             continue
         
         # 尝试分解分式
         ast_expr = solver.ast_apart(orig_ast)
-        print("Aparted expression:",solver.ast_to_str(ast_expr))
-        try_res = test_integral(ast_expr)
-        if try_res:
-            print(f"Successfully solved: {solver.ast_to_str(try_res)}")
-            lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
-            continue
+        if ast_expr is not None:
+            print("Aparted expression:",solver.ast_to_str(ast_expr))
+            try_res = test_integral(ast_expr)
+            if try_res:
+                print(f"Successfully solved: {solver.ast_to_str(try_res)}")
+                lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+                continue
         
         # 尝试化简
         ast_expr = solver.ast_cancel(orig_ast)
@@ -372,12 +417,17 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Simplification")
             continue
 
         # 那很没办法了
+        lst.append(f"\\int {solver.str_to_latex(expr)} dx = \\text{{CANT SOLVED}} \\\\")
         print(f"CANNOT SOLVE: {expr}")
 
     for item in lst:
         print(item)
     
-    print(f"Solved {len(lst)} of {len(tests)} expressions.")
+    print("Method used:",lst_name[lst.index(item)])
+
+    # print(f"Solved {len(lst)} of {len(tests)} expressions.") # 没积出来的也会展示
+    #TODO 多种方法用于积分时似乎不能全部展示？需要更多例子
