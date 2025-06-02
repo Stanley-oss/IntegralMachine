@@ -274,193 +274,189 @@
         "result":"(1/(2*a))*log(abs((x - a)/(x + a)))"
     },
     {
-        "name":"PolyExp2 Rule",                    
+        "name":"PolyExp2 Rule",
         "pattern":"x**2*exp(k*x)",
         "cond":"k != 0",
         "result":"exp(k*x)*(x**2/k - 2*x/k**2 + 2/k**3)"
     },
     {
-        "name":"PolyExp3 Rule",                    
+        "name":"PolyExp3 Rule",
         "pattern":"x**3*exp(k*x)",
         "cond":"k != 0",
         "result":"exp(k*x)*(x**3/k - 3*x**2/k**2 + 6*x/k**3 - 6/k**4)"
     },
     {
-        "name":"PolySin2 Rule",                    
+        "name":"PolySin2 Rule",
         "pattern":"x**2*sin(k*x)",
         "cond":"k != 0",
         "result":"-x**2*cos(k*x)/k + 2*x*sin(k*x)/k**2 + 2*cos(k*x)/k**3"
     },
     {
-        "name":"PolyCos2 Rule",                    
+        "name":"PolyCos2 Rule",
         "pattern":"x**2*cos(k*x)",
         "cond":"k != 0",
         "result":"x**2*sin(k*x)/k + 2*x*cos(k*x)/k**2 - 2*sin(k*x)/k**3"
     },
     {
-        "name":"PolySin3 Rule",                    
+        "name":"PolySin3 Rule",
         "pattern":"x**3*sin(k*x)",
         "cond":"k != 0",
         "result":"-x**3*cos(k*x)/k + 3*x**2*sin(k*x)/k**2 + 6*x*cos(k*x)/k**3 - 6*sin(k*x)/k**4"
     },
     {
-        "name":"PolyCos3 Rule",                    
+        "name":"PolyCos3 Rule",
         "pattern":"x**3*cos(k*x)",
         "cond":"k != 0",
         "result":"x**3*sin(k*x)/k + 3*x**2*cos(k*x)/k**2 - 6*x*sin(k*x)/k**3 - 6*cos(k*x)/k**4"
     },
     {
-        "name":"ExpCos Rule",                      
+        "name":"ExpCos Rule",                     
         "pattern":"exp(a*x)*cos(b*x)",
         "cond":"a != 0 || b != 0",
         "result":"exp(a*x)*(a*cos(b*x) + b*sin(b*x))/(a**2 + b**2)"
     },
     {
-        "name":"ExpSin Rule",                      
+        "name":"ExpSin Rule",
         "pattern":"exp(a*x)*sin(b*x)",
         "cond":"a != 0 || b != 0",
         "result":"exp(a*x)*(a*sin(b*x) - b*cos(b*x))/(a**2 + b**2)"
     },
     {
-        "name":"LnSquared Rule",                   
+        "name":"LnSquared Rule",
         "pattern":"log(x)**2",
         "cond":"",
         "result":"x*log(x)**2 - 2*x*log(x) + 2*x"
     },
     {
-        "name":"LnCubed Rule",                     
+        "name":"LnCubed Rule",
         "pattern":"log(x)**3",
         "cond":"",
         "result":"x*log(x)**3 - 3*x*log(x)**2 + 6*x*log(x) - 6*x"
     },
     {
-        "name":"PolyExpSinCos Combo",              
+        "name":"PolyExpSinCos Combo",
         "pattern":"exp(a*x)*(A*sin(b*x) + B*cos(b*x))",
         "cond":"a != 0 || b != 0",
         "result":"exp(a*x)*((A*a - B*b)*sin(b*x) + (A*b + B*a)*cos(b*x))/(a**2 + b**2)"
     },
     {
-        "name":"Sin Shift Rule",                  
+        "name":"Sin Shift Rule",
         "pattern":"sin(a*x + b)",
         "cond":"a != 0",
         "result":"-cos(a*x + b)/a"
     },
     {
-        "name":"Cos Shift Rule",                  
+        "name":"Cos Shift Rule",
         "pattern":"cos(a*x + b)",
         "cond":"a != 0",
         "result":"sin(a*x + b)/a"
     },
     {
-        "name":"SecSq General Rule",              
+        "name":"SecSq General Rule",
         "pattern":"sec(k*x)**2",
         "cond":"k != 0",
         "result":"tan(k*x)/k"
     },
     {
-        "name":"CscSq General Rule",              
+        "name":"CscSq General Rule",
         "pattern":"csc(k*x)**2",
         "cond":"k != 0",
         "result":"-cot(k*x)/k"
     },
     {
-        "name":"SecTan General Rule",             
+        "name":"SecTan General Rule",
         "pattern":"sec(k*x)*tan(k*x)",
         "cond":"k != 0",
         "result":"sec(k*x)/k"
     },
     {
-        "name":"CscCot General Rule",             
+        "name":"CscCot General Rule",
         "pattern":"csc(k*x)*cot(k*x)",
         "cond":"k != 0",
         "result":"-csc(k*x)/k"
     },
     {
-        "name":"TanSquared Rule",                 
+        "name":"TanSquared Rule",
         "pattern":"tan(k*x)**2",
         "cond":"k != 0",
         "result":"tan(k*x)/k - x"
     },
     {
-        "name":"CotSquared Rule",                 
+        "name":"CotSquared Rule",
         "pattern":"cot(k*x)**2",
         "cond":"k != 0",
         "result":"-cot(k*x)/k - x"
     },
     {
-        "name":"TanCubed Rule",                   
+        "name":"TanCubed Rule",
         "pattern":"tan(k*x)**3",
         "cond":"k != 0",
         "result":"(log(abs(cos(k*x))) + 1/(2*cos(k*x)**2))/k"
     },
     {
-        "name":"CotCubed Rule",                   
+        "name":"CotCubed Rule",
         "pattern":"cot(k*x)**3",
         "cond":"k != 0",
         "result":"(-log(abs(sin(k*x))) - 1/(2*sin(k*x)**2))/k"
     },
     {
-        "name":"SecCubed Rule",                   
+        "name":"SecCubed Rule",
         "pattern":"sec(k*x)**3",
         "cond":"k != 0",
         "result":"(sec(k*x)*tan(k*x))/(2*k) + log(abs(sec(k*x)+tan(k*x)))/(2*k)"
     },
     {
-        "name":"CscCubed Rule",                   
+        "name":"CscCubed Rule",
         "pattern":"csc(k*x)**3",
         "cond":"k != 0",
         "result":"(-csc(k*x)*cot(k*x))/(2*k) - log(abs(csc(k*x)+cot(k*x)))/(2*k)"
     },
     {
-        "name":"SecFourth Rule",                  
+        "name":"SecFourth Rule",
         "pattern":"sec(k*x)**4",
         "cond":"k != 0",
         "result":"tan(k*x)/k + tan(k*x)**3/(3*k)"
     },
     {
-        "name":"CscFourth Rule",                  
+        "name":"CscFourth Rule",
         "pattern":"csc(k*x)**4",
         "cond":"k != 0",
         "result":"-cot(k*x)/k - cot(k*x)**3/(3*k)"
     },
     {
-        "name":"SinCubed Rule",                   
+        "name":"SinCubed Rule",
         "pattern":"sin(k*x)**3",
         "cond":"k != 0",
         "result":"(cos(k*x)**3)/(3*k) - cos(k*x)/k"
     },
     {
-        "name":"CosCubed Rule",                   
+        "name":"CosCubed Rule",
         "pattern":"cos(k*x)**3",
         "cond":"k != 0",
         "result":"sin(k*x)/k - sin(k*x)**3/(3*k)"
     },
     {
-        "name":"SinCos Product Rule",             
+        "name":"SinCos Product Rule",
         "pattern":"sin(k*x)*cos(k*x)",
         "cond":"k != 0",
         "result":"sin(k*x)**2/(2*k)"
     },
     {
-        "name":"SinSquared General Rule",         
+        "name":"SinSquared General Rule",
         "pattern":"sin(k*x)**2",
         "cond":"k != 0",
         "result":"x/2 - sin(2*k*x)/(4*k)"
     },
     {
-        "name":"CosSquared General Rule",         
+        "name":"CosSquared General Rule",
         "pattern":"cos(k*x)**2",
         "cond":"k != 0",
         "result":"x/2 + sin(2*k*x)/(4*k)"
     },
     {
-        "name":"SinSqCos Rule",                   
+        "name":"SinSqCos Rule",
         "pattern":"sin(k*x)**2*cos(k*x)",
         "cond":"k != 0",
         "result":"sin(k*x)**3/(3*k)"
     }
-<<<<<<< HEAD
-=======
-        
->>>>>>> 8bf7f5e2071fc2df0994cd8eb3e55e5e38691d80
 ]
