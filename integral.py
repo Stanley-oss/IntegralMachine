@@ -294,6 +294,7 @@ class IntegralSolver:
         return None
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     tests = ["114514",
              "sin(-x)",
              "x*exp(x)",
@@ -320,6 +321,28 @@ if __name__ == '__main__':
              "(0.5 * (sin((x + (2 * x))) + sin((x - (2 * x)))))",
             #  "(x**2)*(sin(x)**2)" #连续换元两次真投降了
             ]
+=======
+    tests = [ "123",
+              "sin(x)/3",
+              "0.25*cos(x)+8*x**5",
+              "5+x",
+              "(2*x+3)**2",
+              "x**2+x**3",
+              "sqrt(1-x**2)",
+              "1/(4*x+3)",
+              "exp(3*x)",
+              "1/(5*x + 2)",
+              "sin(4*x)",
+              "cos(-2*x)",
+              "tan(x)",
+              "1/cos(x)**2",
+              #"x*exp(x)", TODO 这个例子跑的有问题
+              "x*sin(x)",
+              "x*cos(x)",
+              "(x**3+2*x**2+4*x+1)/(x**2+2*x+1)"# 部分分式
+              #"(x**2)*(sin(x)**2)" #连续换元两次真投降了
+             ]
+>>>>>>> 8bf7f5e2071fc2df0994cd8eb3e55e5e38691d80
     solver = IntegralSolver()
 
     def test_integral(node): # 测试积分函数 用于提出常数利于匹配规则
@@ -371,8 +394,7 @@ if __name__ == '__main__':
                     return None
                 else:
                     return ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=node.right),op=ast.Mult(),right=lhs)
-        return solver.try_rules(node)
-
+        return solver.try_rules(node) 
     lst = []
     lst_name = [[]for _ in tests]
 
@@ -402,6 +424,7 @@ if __name__ == '__main__':
         
         # 尝试分解分式
         ast_expr = solver.ast_apart(orig_ast)
+<<<<<<< HEAD
         if ast_expr is not None:
             print("Aparted expression:",solver.ast_to_str(ast_expr))
             try_res = test_integral(ast_expr)
@@ -409,6 +432,15 @@ if __name__ == '__main__':
                 print(f"Successfully solved: {solver.ast_to_str(try_res)}")
                 lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
                 continue
+=======
+        print("Aparted expression:",solver.ast_to_str(ast_expr))
+        try_res = test_integral(ast_expr)
+        if try_res:
+            print(f"Successfully solved: {solver.ast_to_str(try_res)}")
+            lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+            lst_name[tests.index(expr)].append("Partial Fraction Decomposition")
+            continue
+>>>>>>> 8bf7f5e2071fc2df0994cd8eb3e55e5e38691d80
         
         # 尝试化简
         ast_expr = solver.ast_cancel(orig_ast)
@@ -426,8 +458,14 @@ if __name__ == '__main__':
 
     for item in lst:
         print(item)
+<<<<<<< HEAD
     
     print("Method used:",lst_name[lst.index(item)])
 
     # print(f"Solved {len(lst)} of {len(tests)} expressions.") # 没积出来的也会展示
+=======
+        print("Method used:",lst_name[lst.index(item)])
+
+    #print(f"Solved {len(lst)} of {len(tests)} expressions.") 没积出来的也会展示
+>>>>>>> 8bf7f5e2071fc2df0994cd8eb3e55e5e38691d80
     #TODO 多种方法用于积分时似乎不能全部展示？需要更多例子
