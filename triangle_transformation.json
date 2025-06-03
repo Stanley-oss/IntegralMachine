@@ -291,19 +291,19 @@
         "name": "Half Angle - Sine",
         "pattern": "sin(x/2)",
         "cond": "",
-        "result": "±sqrt((1 - cos(x)) / 2)"
+        "result": "sqrt((1 - cos(x)) / 2)" 
     },
     {
         "name": "Half Angle - Cosine",
         "pattern": "cos(x/2)",
         "cond": "",
-        "result": "±sqrt((1 + cos(x)) / 2)"
+        "result": "sqrt((1 + cos(x)) / 2)"
     },
     {
         "name": "Half Angle - Tangent",
         "pattern": "tan(x/2)",
         "cond": "cos(x) != 1",
-        "result": "±sqrt((1 - cos(x)) / (1 + cos(x)))"
+        "result": "sqrt((1 - cos(x)) / (1 + cos(x)))"
     },
     {
         "name": "Half Angle - Tangent (sin/cos form)",
@@ -327,7 +327,7 @@
         "name": "Half Angle - Cotangent",
         "pattern": "cot(x/2)",
         "cond": "",
-        "result": "±sqrt((1 + cos(x)) / (1 - cos(x)))"
+        "result": "sqrt((1 + cos(x)) / (1 - cos(x)))"
     },
     {
         "name": "Half Angle - Cotangent (sin/cos form)",
@@ -351,13 +351,13 @@
         "name": "Half Angle - Secant",
         "pattern": "sec(x/2)",
         "cond": "sec(x) != -1",
-        "result": "±sqrt((2 * sec(x)) / (sec(x) + 1))"
+        "result": "sqrt((2 * sec(x)) / (sec(x) + 1))"
     },
     {
         "name": "Half Angle - Cosecant",
         "pattern": "csc(x/2)",
         "cond": "sec(x) != 1",
-        "result": "±sqrt((2 * sec(x)) / (sec(x) - 1))"
+        "result": "sqrt((2 * sec(x)) / (sec(x) - 1))"
     },
     {
         "name": "Power Reduction - sin²",

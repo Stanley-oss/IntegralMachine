@@ -31,9 +31,9 @@ class ApplyMapping(ast.NodeTransformer):
             return copy.deepcopy(self.mapping[node.id])
         return node
 
-class IntegralSolver:
+class IntegralSolver():
     def __init__(self):
-        self.rules = json.load(open('rules.json'))
+        self.rules = json.load(open("rules.json")) # 读取规则
 
     def str_to_sympy(self,expr):
         """
@@ -318,6 +318,12 @@ if __name__ == '__main__':
              "-2*x**2+3*x-x*exp(x)",
              "-sin(x)",
              "(0.5 * (sin((x + (2 * x))) + sin((x - (2 * x)))))",
+             "x*sin(x)",
+            "sin(x)**2",
+            "cos(x)**2",
+            "sin(x)*cos(x)",
+            "cos(x*2)**2",
+            "tan(x)**2"
             #  "(x**2)*(sin(x)**2)" #连续换元两次真投降了
             ]
     solver = IntegralSolver()
@@ -378,7 +384,7 @@ if __name__ == '__main__':
     for expr in tests:
         print("Original expression:",expr)
         orig_ast = solver.str_to_ast(expr)
-        print("AST:",ast.dump(orig_ast))
+        #print("AST:",ast.dump(orig_ast))
         # 展示一个积分过程:
         # 看看能不能直接匹配
         try_res = test_integral(orig_ast)
@@ -424,9 +430,8 @@ if __name__ == '__main__':
         print(f"CANNOT SOLVE: {expr}")
 
     for item in lst:
-        print(item)
-    
-    print("Method used:",lst_name[lst.index(item)])
+        print(item)   
+        print("Method used:",lst_name[lst.index(item)])
 
     # print(f"Solved {len(lst)} of {len(tests)} expressions.") # 没积出来的也会展示
     #TODO 多种方法用于积分时似乎不能全部展示？需要更多例子
