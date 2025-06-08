@@ -458,5 +458,11 @@
         "pattern":"sin(k*x)**2*cos(k*x)",
         "cond":"k != 0",
         "result":"sin(k*x)**3/(3*k)"
+    },
+    {
+    "name": "Arctangent Standard Rule",
+    "pattern": "1/(a**2 + t**2)",
+    "cond": "a != 0",
+    "result": "(1/a)*arctan(t/a)"
     }
 ]
