@@ -484,5 +484,17 @@
         "pattern": "a*sin(x) + b*cos(x)",
         "cond": "a > 0",
         "result": "sqrt(a**2 + b**2) * sin(x + atan(b/a))"
+    },
+    {
+      "name": "Universal Formula - sin(x) in terms of tan(x/2)",
+      "pattern": "sin(x)",
+      "cond": "",
+      "result": "2*tan(x/2)/(1 + tan(x/2)**2)"
+    },
+    {
+      "name": "Universal Formula - cos(x) in terms of tan(x/2)",
+      "pattern": "cos(x)",
+      "cond": "",
+      "result": "(1 - tan(x/2)**2)/(1 + tan(x/2)**2)"
     }
 ]
