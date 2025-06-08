@@ -461,14 +461,14 @@
     },
     {
     "name": "Arctangent Standard Rule",
-    "pattern": "1/(a**2 + t**2)",
+    "pattern": "1/(a**2 + x**2)",
     "cond": "a != 0",
-    "result": "(1/a)*arctan(t/a)"
+    "result": "(1/a)*arctan(x/a)"
     },
     {
     "name": "Arcsin Standard Rule",               
-    "pattern": "1/sqrt(a**2 - t**2)",             
+    "pattern": "1/sqrt(a**2 - x**2)",             
     "cond": "a > 0",                              
-    "result": "arcsin(t/a)"                       
+    "result": "arcsin(x/a)"                       
     }
 ]
