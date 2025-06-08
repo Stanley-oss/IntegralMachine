@@ -464,5 +464,11 @@
     "pattern": "1/(a**2 + t**2)",
     "cond": "a != 0",
     "result": "(1/a)*arctan(t/a)"
+    },
+    {
+    "name": "Arcsin Standard Rule",               
+    "pattern": "1/sqrt(a**2 - t**2)",             
+    "cond": "a > 0",                              
+    "result": "arcsin(t/a)"                       
     }
 ]
