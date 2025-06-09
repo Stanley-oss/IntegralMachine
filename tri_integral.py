@@ -5,14 +5,22 @@ import json
 import ast
 import astor
 import sympy
+import copy
 #尝试展开，分解，化简，换元
 #规则会大多数基于恒等变形 如：降次
 tests = ["x*sin(x)",
          "sin(x)**2",
          "cos(x)**2",
          "sin(x)*cos(x)",
+         "cos(x)*sin(x)",
          "cos(2*x)**2",
          "tan(x)**2",
+         "sin(x)*cos(2*x)",
+         "cos(x)*cos(3*x)",
+         "sin(x)*sin(5*x)",
+         "1/(sin(x)+cos(x))",
+         "sin(x)**3 * cos(x)",
+         "sin(x) / (1 + cos(x))"#换元
          ]
 def check_tri_integral(expr):
     tri_functions = {"sin", "cos", "tan", "cot", "sec", "csc"}
@@ -29,7 +37,7 @@ def check_tri_integral(expr):
 
 class TriTransformation():
     def __init__(self):
-        self.rules = json.load(open("triangle_transformation.json"))
+        self.rules = json.load(open("triangle_transformation.json", encoding='utf-8'))
         for rule in self.rules:
             rule["pattern"] = ast.parse(rule["pattern"], mode='eval').body
             rule["result"] = ast.parse(rule["result"], mode='eval').body
@@ -107,6 +115,7 @@ def test_tri_integral(node, visited=None):
     if visited is None:
         visited = set()  # 初始化已访问节点集合
 
+
     # 检查是否已经访问过当前节点，防止无限递归
     if id(node) in visited:
         return None
@@ -177,11 +186,13 @@ TriTransformer = TriTransformation()
 lst = []
 #lst_name = [[] for _ in tests]
 for expr in tests:
-    if check_tri_integral(expr):  
+    if check_tri_integral(expr):
         orig_ast = solver.str_to_ast(expr)  
         transformed_expr = TriTransformer.transform_expr(expr)  # 三角变换，跟test_tri_integral函数有重复部分
+        
         node = ast.parse(transformed_expr, mode="eval").body  # 解析变换后的表达式
         try_res = test_tri_integral(node)  # 尝试积分
+        
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
@@ -191,3 +202,5 @@ for expr in tests:
 
 for i in lst:
     print(i)
+
+print(f"Solved {len(lst)} of {len(tests)}")

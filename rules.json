@@ -155,10 +155,6 @@
         "cond":"a != 0 && n != -1",
         "result":"(a*x + b)**(n + 1)/(a*(n + 1))"
     },
-    
-
-
-    
     {
         "name":"Tangent Rule", 
         "pattern":"tan(k*x)",
@@ -460,15 +456,15 @@
         "result":"sin(k*x)**3/(3*k)"
     },
     {
-    "name": "Arctangent Standard Rule",
-    "pattern": "1/(a**2 + x**2)",
-    "cond": "a != 0",
-    "result": "(1/a)*arctan(x/a)"
+        "name": "Arctangent Standard Rule",
+        "pattern": "1/(a**2 + x**2)",
+        "cond": "a != 0",
+        "result": "(1/a)*arctan(x/a)"
     },
     {
-    "name": "Arcsin Standard Rule",               
-    "pattern": "1/sqrt(a**2 - x**2)",             
-    "cond": "a > 0",                              
-    "result": "arcsin(x/a)"                       
+        "name": "Arcsin Standard Rule",
+        "pattern": "1/sqrt(a**2 - x**2)",
+        "cond": "a > 0",
+        "result": "arcsin(x/a)"
     }
 ]
