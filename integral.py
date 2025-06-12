@@ -524,7 +524,7 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
-            lst_name[tests.index(expr)].append(match_rules)
+            lst_name[tests.index(expr)].append((match_rules,solver.ast_to_str(orig_ast),solver.ast_to_str(try_res)))
             match_rules = None
             continue
 
@@ -535,7 +535,9 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
-            lst_name[tests.index(expr)].append("Polynomial Expansion")
+            lst_name[tests.index(expr)].append(("Polynomial Expansion", solver.ast_to_str(orig_ast), solver.ast_to_str(ast_expr)))
+            lst_name[tests.index(expr)].append((match_rules, solver.ast_to_str(ast_expr), solver.ast_to_str(try_res)))
+ 
             continue
         
         # 尝试分解分式
@@ -546,6 +548,9 @@ if __name__ == '__main__':
             if try_res:
                 print(f"Successfully solved: {solver.ast_to_str(try_res)}")
                 lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
+                lst_name[tests.index(expr)].append(("Aparted expression",solver.ast_to_str(orig_ast),solver.ast_to_str(ast_expr)))
+                lst_name[tests.index(expr)].append((match_rules, solver.ast_to_str(ast_expr), solver.ast_to_str(try_res)))
+
                 continue
         
         # 尝试化简
@@ -555,7 +560,9 @@ if __name__ == '__main__':
         if try_res:
             print(f"Successfully solved: {solver.ast_to_str(try_res)}")
             lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
-            lst_name[tests.index(expr)].append("Simplification")
+            lst_name[tests.index(expr)].append(("Simplification",solver.ast_to_str(orig_ast),solver.ast_to_str(ast_expr)))
+            lst_name[tests.index(expr)].append((match_rules, solver.ast_to_str(ast_expr), solver.ast_to_str(try_res)))
+
             continue
 
         # 那很没办法了
@@ -569,11 +576,21 @@ if __name__ == '__main__':
             if try_res:
                 print(f"Successfully solved: {solver.ast_to_str(try_res)}")
                 lst.append(f"\\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)} + C \\\\")
-                continue
+                lst_name[tests.index(expr)].append(("Replaced expression",solver.ast_to_str(orig_ast),solver.ast_to_str(ast_expr)))
+                lst_name[tests.index(expr)].append((match_rules, solver.ast_to_str(ast_expr), solver.ast_to_str(try_res)))
 
+                continue
+    
+    print()
+    print("------RESULTS------")
     for item in lst:
         print(item)
-        # print("Method used:",lst_name[lst.index(item)])
+        index = lst.index(item)
+        for method, ori, trans in lst_name[index]:
+            print("Method used:", method)
+            print("From:", ori)
+            print("To:", trans)
+        print()
 
     # print(f"Solved {len(lst)} of {len(tests)} expressions.") # 没积出来的也会展示
-    #TODO 多种方法用于积分时似乎不能全部展示？需要更多例子
+
