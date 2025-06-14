@@ -106,7 +106,7 @@ class TrigTransform(ast.NodeTransformer):
         try:
             return bool(eval(cond, {__builtins__: {}}, namespace))
         except Exception:
-            # 投降！无法评估的条件直接通过让他替换
+            # 无法评估的条件直接通过让他替换
             return True
 
     def generic_visit(self, node):
@@ -213,7 +213,7 @@ class IntegralSolver:
         """
         匹配一个模式
         原理:分别拿到模式的AST和节点的AST,递归比较
-        如果有遇到变量,则构建mappin_list,记录变量的映射关系
+        如果有遇到变量,则构建mapping_list,记录变量的映射关系
         """
         if isinstance(pattern, ast.Name):  # 模式要求一个变量名
             name = pattern.id
@@ -295,11 +295,11 @@ class IntegralSolver:
         if isinstance(node, ast.Constant):
             return node.value
         if isinstance(node, ast.Name):
-            mapto = mapping_dict.get(node.id)  # 映射到被积分式中的那个东西(是一个常量)
-            if isinstance(mapto, ast.Constant):
-                return mapto.value
+            map_to = mapping_dict.get(node.id)  # 映射到被积分式中的那个东西(是一个常量)
+            if isinstance(map_to, ast.Constant):
+                return map_to.value
             else:
-                return self.judge(mapto, mapping_dict)  # 别的如果是个多项式什么的 递归判断吧
+                return self.judge(map_to, mapping_dict)  # 别的如果是个多项式什么的 递归判断吧
         if isinstance(node, ast.UnaryOp):
             value = self.judge(node.operand, mapping_dict)
             if isinstance(node.op, ast.UAdd):
@@ -349,7 +349,6 @@ class IntegralSolver:
         raise ValueError('Unsupported node type: %s' % type(node))
 
     def try_rules(self, node):
-        # global match_rules
         """
         尝试应用所有规则
         如果有匹配成功的规则,则返回两个变量,第一个变量是积分后的结果ast,第二个变量是应用的规则名称
@@ -368,12 +367,13 @@ class IntegralSolver:
                 if ok:
                     res_ast = ast.parse(rule['result'], mode='eval').body
                     res_ast = ApplyMapping(mapping_dict).visit(res_ast)
-                    # match_rules = rule['name']
-                    return res_ast
-        print(f"NOT SUPPORTED: {astunparse.unparse(node).strip()}")
+                    return res_ast, rule['name']
         return None
 
-    def integral(self, node):  # 测试积分函数 用于提出常数利于匹配规则
+    def dfs(self, node, procedure):
+        """
+        实现积化和差 提出常数等操作并搜索尝试应用规则
+        """
         if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mult):  # 积化和差（但是没用，因为结果没化简，应该需要再调用sympy化简）
             is_func = lambda node, func: isinstance(node, ast.Call) and isinstance(node.func,
                                                                                    ast.Name) and node.func.id == func
@@ -391,11 +391,14 @@ class IntegralSolver:
                 cos_A_add_B = ast.Call(func=ast.Name(id="cos", ctx=ast.Load()),
                                        args=[ast.BinOp(left=cpy(A), op=ast.Add(), right=cpy(B))],
                                        keywords=[])
-                return self.integral(
-                    solver.ast_cancel(
-                        ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
-                                  op=ast.Mult(),
-                                  right=ast.BinOp(left=cos_A_sub_B, op=ast.Sub(), right=cos_A_add_B))))
+                transformed_ast = self.ast_cancel(
+                    ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
+                              op=ast.Mult(),
+                              right=ast.BinOp(left=cos_A_sub_B, op=ast.Sub(), right=cos_A_add_B)))
+                procedure.append({"rule": "Trig Identities: sin(A)*sin(B) -> 1/2(cos(A-B) - cos(A+B))",
+                                  "before": self.ast_to_latex(node),
+                                  "after": self.ast_to_latex(transformed_ast)})
+                return self.dfs(transformed_ast, procedure)
 
             # cos(A)*cos(B) -> 1/2(cos(A-B) + cos(A+B))
             if is_func(lhs, "cos") and is_func(rhs, "cos"):
@@ -407,11 +410,14 @@ class IntegralSolver:
                 sin_A_add_B = ast.Call(func=ast.Name(id="cos", ctx=ast.Load()),
                                        args=[ast.BinOp(left=cpy(A), op=ast.Add(), right=cpy(B))],
                                        keywords=[])
-                return self.integral(
-                    solver.ast_cancel(
-                        ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
-                                  op=ast.Mult(),
-                                  right=ast.BinOp(left=sin_A_sub_B, op=ast.Add(), right=sin_A_add_B))))
+                transformed_ast = self.ast_cancel(
+                    ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
+                              op=ast.Mult(),
+                              right=ast.BinOp(left=sin_A_sub_B, op=ast.Add(), right=sin_A_add_B)))
+                procedure.append({"rule": "Trig Identities: cos(A)*cos(B) -> 1/2(cos(A-B) + cos(A+B))",
+                                  "before": self.ast_to_latex(node),
+                                  "after": self.ast_to_latex(transformed_ast)})
+                return self.dfs(transformed_ast, procedure)
 
             # sin(A)*cos(B) -> 1/2(sin(A+B) + sin(A-B))
             if is_func(lhs, "sin") and is_func(rhs, "cos"):
@@ -423,11 +429,14 @@ class IntegralSolver:
                 sin_A_add_B = ast.Call(func=ast.Name(id="sin", ctx=ast.Load()),
                                        args=[ast.BinOp(left=cpy(A), op=ast.Add(), right=cpy(B))],
                                        keywords=[])
-                return self.integral(
-                    solver.ast_cancel(
-                        ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
-                                  op=ast.Mult(),
-                                  right=ast.BinOp(left=sin_A_sub_B, op=ast.Add(), right=sin_A_add_B))))
+                transformed_ast = self.ast_cancel(
+                    ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
+                              op=ast.Mult(),
+                              right=ast.BinOp(left=sin_A_sub_B, op=ast.Add(), right=sin_A_add_B)))
+                procedure.append({"rule": "Trig Identities: sin(A)*cos(B) -> 1/2(sin(A+B) + sin(A-B))",
+                                  "before": self.ast_to_latex(node),
+                                  "after": self.ast_to_latex(transformed_ast)})
+                return self.dfs(transformed_ast, procedure)
 
             # cos(A)*sin(B) -> 1/2(sin(A+B) - sin(A-B))
             if is_func(lhs, "cos") and is_func(rhs, "sin"):
@@ -439,21 +448,29 @@ class IntegralSolver:
                 sin_A_add_B = ast.Call(func=ast.Name(id="sin", ctx=ast.Load()),
                                        args=[ast.BinOp(left=cpy(A), op=ast.Add(), right=cpy(B))],
                                        keywords=[])
-                return self.integral(
-                    solver.ast_cancel(
-                        ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
-                                  op=ast.Mult(),
-                                  right=ast.BinOp(left=sin_A_sub_B, op=ast.Sub(), right=sin_A_add_B))))
+                transformed_ast = self.ast_cancel(
+                    ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=ast.Constant(value=2)),
+                              op=ast.Mult(),
+                              right=ast.BinOp(left=sin_A_sub_B, op=ast.Sub(), right=sin_A_add_B)))
+                procedure.append({"rule": "Trig Identities: cos(A)*sin(B) -> 1/2(sin(A+B) - sin(A-B))",
+                                  "before": self.ast_to_latex(node),
+                                  "after": self.ast_to_latex(transformed_ast)})
+                return self.dfs(transformed_ast, procedure)
 
         if isinstance(node, ast.Constant):  # 为一个常数
             if node.value == 0:
                 return ast.Constant(value=0)
+
+            procedure.append({"rule": "Constant Rule: a -> ax",
+                              "before": self.ast_to_latex(node),
+                              "after": self.ast_to_latex(ast.BinOp(left=node, op=ast.Mult(),
+                                                                   right=ast.Name(id=INTEGRAL_VAR, ctx=ast.Load())))})
             return ast.BinOp(left=node, op=ast.Mult(), right=ast.Name(id=INTEGRAL_VAR, ctx=ast.Load()))
         if isinstance(node, ast.UnaryOp) and isinstance(node.op, ast.USub):  # 提出一个单独的负号
-            return ast.BinOp(left=ast.Constant(value=-1), op=ast.Mult(), right=self.integral(node.operand))
+            return ast.BinOp(left=ast.Constant(value=-1), op=ast.Mult(), right=self.dfs(node.operand, procedure))
         if isinstance(node, ast.BinOp) and isinstance(node.op, (ast.Add, ast.Sub)):  # 两个表达式相加或相减
-            lhs = self.integral(node.left)
-            rhs = self.integral(node.right)
+            lhs = self.dfs(node.left, procedure)
+            rhs = self.dfs(node.right, procedure)
             if lhs is None or rhs is None:  # 到时候积不出来可以调库
                 return None
             else:
@@ -461,14 +478,14 @@ class IntegralSolver:
         if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mult):  # 两个表达式相乘 提出常数
             # if isinstance(node.left,ast.Constant):
             if self.is_constant(node.left):
-                rhs = self.integral(node.right)
+                rhs = self.dfs(node.right, procedure)
                 if rhs is None:
                     return None
                 else:
                     return ast.BinOp(left=node.left, op=node.op, right=rhs)
             # if isinstance(node.right,ast.Constant):
             if self.is_constant(node.right):
-                lhs = self.integral(node.left)
+                lhs = self.dfs(node.left, procedure)
                 if lhs is None:
                     return None
                 else:
@@ -477,28 +494,91 @@ class IntegralSolver:
             if isinstance(node.left, ast.Constant):  # 分子为常数
                 if node.left.value == 1:  # 先解决1/x和1/(x**c)情况
                     if isinstance(node.right, ast.Name) and node.right.id == INTEGRAL_VAR:  # 1/x
+                        procedure.append({"rule": "Reciprocal Rule: 1/x -> log(x)",
+                                          "before": self.ast_to_latex(node),
+                                          "after": self.ast_to_latex(ast.Call(ast.Name(id='log', ctx=ast.Load()), [
+                                              ast.Name(id=INTEGRAL_VAR, ctx=ast.Load())], []))})
                         return ast.Call(ast.Name(id='log', ctx=ast.Load()), [ast.Name(id=INTEGRAL_VAR, ctx=ast.Load())],
                                         [])
                     if isinstance(node.right, ast.BinOp) and isinstance(node.right.op, ast.Pow):  # 1/(x**c)
-                        return self.integral(ast.BinOp(left=node.right.left,
-                                                       op=ast.Pow(),
-                                                       right=ast.UnaryOp(op=ast.USub(), operand=node.right.right)
-                                                       # x**(-c)
-                                                       ))
+                        procedure.append({"rule": "Power Rule: 1/(x**c) -> 1/c * x**(c-1)",
+                                          "before": self.ast_to_latex(node),
+                                          "after": self.ast_to_latex(ast.BinOp(left=node.right.left,
+                                                                               op=ast.Pow(),
+                                                                               right=ast.UnaryOp(op=ast.USub(),
+                                                                                                 operand=node.right.right)))})  # x**(-c)
+                        return self.dfs(ast.BinOp(left=node.right.left,
+                                                  op=ast.Pow(),
+                                                  right=ast.UnaryOp(op=ast.USub(), operand=node.right.right)),
+                                        procedure)
                 else:
-                    rhs = self.integral(ast.BinOp(ast.Constant(value=1), ast.Div(), node.right))
+                    rhs = self.dfs(ast.BinOp(ast.Constant(value=1), ast.Div(), node.right), procedure)
                     if rhs is None:
                         return None
                     else:
                         return ast.BinOp(left=node.left, op=ast.Mult(), right=rhs)  # 提出分子常数
             if isinstance(node.right, ast.Constant):  # 分母为常数
-                lhs = self.integral(node.left)
+                lhs = self.dfs(node.left, procedure)
                 if lhs is None:
                     return None
                 else:
                     return ast.BinOp(left=ast.BinOp(left=ast.Constant(value=1), op=ast.Div(), right=node.right),
                                      op=ast.Mult(), right=lhs)
-        return self.try_rules(node)
+        apply_rules_res = self.try_rules(node)
+        if apply_rules_res:
+            transformed_ast, rule_name = apply_rules_res
+            procedure.append({"rule": rule_name,
+                              "before": self.ast_to_latex(node),
+                              "after": self.ast_to_latex(transformed_ast)})
+            return transformed_ast
+        return None
+
+    def integral(self, expr):
+        """
+        对Python表达式进行积分
+        """
+        result = {
+            "answer": None,
+            "procedure": []
+        }
+        orig_ast = self.str_to_ast(expr)
+        dfs_res = self.dfs(orig_ast, result["procedure"])
+        if dfs_res:
+            result["answer"] = f"\\int {self.str_to_latex(expr)} dx = {self.ast_to_latex(dfs_res)}"
+            return result
+
+        # Polynomial Expansion
+        transformed_ast = self.ast_expand(orig_ast)
+        dfs_res = self.dfs(transformed_ast, result["procedure"])
+        if dfs_res:
+            result["procedure"].append({"rule": "Polynomial Expansion",
+                                        "before": self.ast_to_latex(orig_ast),
+                                        "after": self.ast_to_latex(transformed_ast)})
+            result["answer"] = f"\\int {self.str_to_latex(expr)} dx = {self.ast_to_latex(dfs_res)}"
+            return result
+
+        # Apart Expression
+        transformed_ast = self.ast_apart(orig_ast)
+        if transformed_ast is not None:
+            dfs_res = self.dfs(transformed_ast, result["procedure"])
+            if dfs_res:
+                result["procedure"].append({"rule": "Apart Expression",
+                                            "before": self.ast_to_latex(orig_ast),
+                                            "after": self.ast_to_latex(transformed_ast)})
+                result["answer"] = f"\\int {self.str_to_latex(expr)} dx = {self.ast_to_latex(dfs_res)}"
+                return result
+
+        # Simplification
+        transformed_ast = self.ast_cancel(orig_ast)
+        dfs_res = self.dfs(transformed_ast, result["procedure"])
+        if dfs_res:
+            result["procedure"].append({"rule": "Simplification",
+                                        "before": self.ast_to_latex(orig_ast),
+                                        "after": self.ast_to_latex(transformed_ast)})
+            result["answer"] = f"\\int {self.str_to_latex(expr)} dx = {self.ast_to_latex(dfs_res)}"
+            return result
+
+        return None
 
 
 if __name__ == '__main__':
@@ -543,48 +623,9 @@ if __name__ == '__main__':
     solver = IntegralSolver()
     trig_transformer = TrigTransform()
 
-    lst = []
-
     for expr in tests:
-        print("Original expression:", expr)
-        orig_ast = solver.str_to_ast(expr)
-        # print("AST:",ast.dump(orig_ast))
-        # 展示一个积分过程:
-        # 看看能不能直接匹配
-        try_res = solver.integral(orig_ast)
-        if try_res:
-            print(f"Successfully solved: {solver.ast_to_str(try_res)}")
-            lst.append(f"\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)}")
-            continue
-
-        # 尝试展开多项式
-        ast_expr = solver.ast_expand(orig_ast)
-        print("Expanded expression:", solver.ast_to_str(ast_expr))
-        try_res = solver.integral(ast_expr)  # Polynomial Expansion
-        if try_res:
-            print(f"Successfully solved: {solver.ast_to_str(try_res)}")
-            lst.append(f"\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)}")
-            continue
-
-        # 尝试分解分式
-        ast_expr = solver.ast_apart(orig_ast)
-        if ast_expr is not None:
-            print("Aparted expression:", solver.ast_to_str(ast_expr))
-            try_res = solver.integral(ast_expr)  # Apart expression
-            if try_res:
-                print(f"Successfully solved: {solver.ast_to_str(try_res)}")
-                lst.append(f"\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)}")
-                continue
-
-        # 尝试化简
-        ast_expr = solver.ast_cancel(orig_ast)
-        print("Canceled expression:", solver.ast_to_str(ast_expr))
-        try_res = solver.integral(ast_expr)  # Simplification
-        if try_res:
-            print(f"Successfully solved: {solver.ast_to_str(try_res)}")
-            lst.append(f"\int {solver.str_to_latex(expr)} dx = {solver.ast_to_latex(try_res)}")
-            continue
-
-    for exp in lst:
-        print(f"{exp} \\\\")
-    # print(f"Solved {len(lst)} of {len(tests)} expressions.") # 没积出来的也会展示
+        res = solver.integral(expr)
+        if res:
+            print(f"{res}")
+        else:
+            print(f"{expr}")
