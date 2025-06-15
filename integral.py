@@ -4,6 +4,8 @@ import astunparse
 import json
 import copy
 import sympy
+from latex2sympy2 import latex2sympy
+import re
 
 INTEGRAL_VAR = 'x'
 
@@ -162,6 +164,16 @@ class IntegralSolver:
         把Python风格的字符串表达式转化为AST
         """
         return FoldConstants().visit(ast.parse(str(self.str_to_sympy(expr)), mode='eval').body)
+    
+    def latex_to_str(self, latex):
+        """
+        把LaTeX形式的字符串表达式转化为Python风格的字符串表达式
+        """
+        prefix_pattern = r"^(\\\\?int)"
+        suffix_pattern = r"(d\s?x)$"
+        latex = re.sub(prefix_pattern, '', latex, flags=re.IGNORECASE)
+        latex = re.sub(suffix_pattern, '', latex, flags=re.IGNORECASE)
+        return str(latex2sympy(latex))
 
     def ast_expand(self, expr):
         """
@@ -579,7 +591,7 @@ class IntegralSolver:
             return result
 
         return None
-
+    
 
 if __name__ == '__main__':
     tests = ["114514",
@@ -629,3 +641,4 @@ if __name__ == '__main__':
             print(f"{res}")
         else:
             print(f"{expr}")
+
