@@ -466,5 +466,29 @@
         "pattern": "1/sqrt(a**2 - x**2)",
         "cond": "a > 0",
         "result": "arcsin(x/a)"
+    },
+        {
+        "name": "Cos Integration Case 1",
+        "pattern": "1 / (a + b * cos(x))",
+        "cond": "a**2 > b**2",
+        "result": "2 * sign(a + b) / sqrt(a**2 - b**2) * arctan( sqrt(a**2 - b**2) * tan(x / 2) / abs(a + b) )"
+    },
+    {
+        "name": "Cos Integration Case 2",
+        "pattern": "1 / (a + b * cos(x))",
+        "cond": "a == b",
+        "result": "(1 / a) * tan(x / 2)"
+    },
+    {
+        "name": "Cos Integration Case 3",
+        "pattern": "1 / (a + b * cos(x))",
+        "cond": "a == -b",
+        "result": "-(1 / a) * cot(x / 2)"
+    },
+    {
+        "name": "Cos Integration Case 4",
+        "pattern": "1 / (a + b * cos(x))",
+        "cond": "a**2 < b**2",
+        "result": "1 / sqrt(b**2 - a**2) * ln( abs( sqrt(b**2 - a**2) * tan(x / 2) + abs(a + b) ) / abs( sqrt(b**2 - a**2) * tan(x / 2) - abs(a + b) ) )"
     }
 ]
