@@ -1,6 +1,6 @@
 # Integral Machine
 ## Setup:
-### First Install PassleOCR:
+### First Install PaddleOCR:
 https://paddlepaddle.github.io/PaddleOCR/main/en/quick_start.html
 ### Then:
 最好先

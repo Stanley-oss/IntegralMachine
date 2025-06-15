@@ -65,7 +65,7 @@ async def calculate_formula_api(request: CalculationRequest):
         result = solver.integral(py_expr)
         return CalculationResponse(
             answer=result.get('answer', ''),
-            steps=[Step(**step) for step in result.get('steps', [])]
+            steps=[Step(**step) for step in reversed(result.get('steps', []))]
         )
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"Error: {e}")
