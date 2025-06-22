@@ -1,33 +1,47 @@
 # Integral Machine
+## Introduction:
+Integral Machine is a system that recognizes mathematical expressions from images and performs integral operations.
+It is powered by a front-end interface and a back-end server powered by a trained BTTR model. This system processes handwritten mathematical expressions through image recognition and performs step-by-step symbolic integration calculations.
+## Function
+1.Recognize handwritten or printed math expressions from images and convert them to LaTeX using a trained BTTR model.
+2.Use SymPy for symbolic integration,aotomatic integration. Frontend for uploading images and viewing results, backend for image recognition and computation.
 ## Setup:
-### First Install PaddleOCR:
-https://paddlepaddle.github.io/PaddleOCR/main/en/quick_start.html
-### Then:
-最好先
+### Backend:
+Create a new environment:
 ```
 python -m venv venv
 .\venv\Scripts\activate
-```
-然后安装库
-```
-pip install astunparse sympy latex2sympy2 fastapi setuptools uvicorn pydantic
+pip install -r requirements.txt
 ```
 ### Frontend:
-安装nvm
-安装node.js
-当npm -v和node -v都能输出版本号就行了
+Install nvm:
+For MacOS:
+Please refer to https://github.com/nvm-sh/nvm
+For Windows:
+Download and install https://github.com/coreybutler/nvm-windows
+Then run:
+```
+nvm install 21
+uvm use 21
+```
 ## How to Run:
 ### Backend:
-在venv下运行:
+Run in venv:
 ```
 uvicorn app.main:app --reload --port 8000
 ```
-后端加载成功显示INFO: Application startup complete.
-### Frontend:
-在integral-machine目录下运行:
+Backend loading is successful and displayed:
 ```
+INFO: Application startup complete.
+```
+### Frontend:
+At the root of the project, run:
+```
+cd ./integral-machine/
 npm run dev
 ```
-前端加载成功显示
+Front-end loading is complete and has been displayed.
+```
 VITE v6.*.*  ready in *** ms
-然后打开网页开始玩...
+```
+Then open the webpage in any browser, have fun!
